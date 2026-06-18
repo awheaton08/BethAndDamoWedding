@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Beth & Damian — RSVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cormorant+SC:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --parchment:  #F7F3EC;
+      --cream:      #EDE8DE;
+      --sage:       #7A9E82;
+      --sage-light: #A8C5AD;
+      --sage-dark:  #3D5A42;
+      --forest:     #2A3D2E;
+      --ink:        #2C2B29;
+      --ink-light:  #6A6760;
+      --border:     #D4CCBC;
+      --white:      #FFFFFF;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--parchment);
+      font-family: 'Jost', sans-serif;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── BOTANICAL BACKGROUND ─────────────────── */
+    .bg-flora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-flora svg {
+      position: absolute;
+      opacity: 0.15;
+    }
+    .bg-flora .fl-tl { top: -40px; left: -40px; width: min(380px, 55vw); }
+    .bg-flora .fl-tr { top: -40px; right: -40px; width: min(340px, 50vw); transform: scaleX(-1); }
+    .bg-flora .fl-bl { bottom: -40px; left: -30px; width: min(320px, 48vw); transform: scaleY(-1); }
+    .bg-flora .fl-br { bottom: -40px; right: -30px; width: min(360px, 52vw); transform: scale(-1,-1); }
+
+    /* ── LAYOUT ───────────────────────────────── */
+    #app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .view { display: none; width: 100%; }
+    .view.active { display: flex; flex-direction: column; align-items: center; }
+
+    /* ── HERO ─────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: clamp(40px, 8vw, 72px) clamp(20px, 5vw, 40px) clamp(28px, 5vw, 40px);
+      width: 100%;
+    }
+    .hero-eyebrow {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: clamp(9px, 2.2vw, 11px);
+      letter-spacing: 0.38em;
+      color: var(--sage-dark);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .hero-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(48px, 12vw, 92px);
+      line-height: 1.0;
+      color: var(--forest);
+      letter-spacing: -0.01em;
+    }
+    .hero-amp { color: var(--sage); }
+
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: clamp(18px, 4vw, 28px) auto;
+      max-width: 260px;
+    }
+    .ornament-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, var(--border));
+    }
+    .ornament-line.r { background: linear-gradient(to left, transparent, var(--border)); }
+    .ornament-leaf { color: var(--sage-light); flex-shrink: 0; }
+
+    .hero-date {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: clamp(11px, 2.5vw, 13px);
+      letter-spacing: 0.28em;
+      color: var(--ink-light);
+    }
+
+    /* ── CONTENT COLUMN ───────────────────────── */
+    .col {
+      width: 100%;
+      max-width: 580px;
+      padding: 0 clamp(16px, 5vw, 28px) 72px;
+    }
+
+    /* ── CARD ─────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: clamp(28px, 7vw, 52px) clamp(24px, 7vw, 52px);
+      box-shadow: 0 6px 48px rgba(42,61,46,0.07), 0 1px 4px rgba(42,61,46,0.04);
+      margin-bottom: 24px;
+    }
+    .card-eyebrow {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      color: var(--sage-dark);
+      text-align: center;
+      margin-bottom: clamp(20px, 5vw, 32px);
+    }
+
+    /* ── FORM ELEMENTS ────────────────────────── */
+    .field { margin-bottom: clamp(16px, 4vw, 22px); }
+    .field label {
+      display: block;
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 9.5px;
+      letter-spacing: 0.32em;
+      color: var(--sage-dark);
+      margin-bottom: 7px;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: clamp(11px, 3vw, 13px) 14px;
+      border: 1px solid var(--border);
+      background: var(--parchment);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(16px, 4vw, 18px);
+      color: var(--ink);
+      outline: none;
+      border-radius: 1px;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus { border-color: var(--sage); }
+    .field textarea { resize: vertical; min-height: 76px; }
+
+    /* ── ATTENDANCE TOGGLE ────────────────────── */
+    .att-legend {
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: 9.5px;
+      letter-spacing: 0.32em;
+      color: var(--sage-dark);
+      display: block;
+      margin-bottom: 10px;
+    }
+    .att-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: clamp(20px, 5vw, 28px); }
+    .att-opt input[type="radio"] { display: none; }
+    .att-opt label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: clamp(12px, 3vw, 15px) 8px;
+      border: 1px solid var(--border);
+      background: var(--parchment);
+      font-family: 'Cormorant SC', serif;
+      font-weight: 300;
+      font-size: clamp(8.5px, 2vw, 10px);
+      letter-spacing: 0.22em;
+      color: var(--ink-light);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 1px;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .att-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: inline-block;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .att-opt input:checked + label {
+      border-color: var(--sage);
+      background: #EDF4EE;
+      color: var(--forest);
+    }
+    .att-opt input:checked + label .att-dot {
+      background: var(--sage);
+      border-color: var(--sage);
+    }
+
+    /* ── MEAL NOTE ────────────────────────────── */
+    .meal-note {
+      background: #EDF4EE;
+      border-left: 2px solid var(--sage-light);
+      padding: 14px 16px;
+      margin-bottom: clamp(16px, 4vw, 22px);
+      border-radius: 1px;
+    }
+    .meal-note p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(14px, 3.5vw, 16px);
+      font-style: italic;
+      color: var(--sage-dark);
+      line-height: 1.65;
+    }
+
+    /* ── PRIMARY BUTTON ───────────────────────── */
+    .btn {
+      width: 100%;
+      padding: clamp(14px, 4vw, 17px);
+      background: var(--forest);
+      color: var(--parchment);
+      border: none;
+      font-family: 'Cormorant SC', serif;
+      font-weight: 400;
+      font-size: clamp(10px, 2.5vw, 11.5px);
+      letter-spacing: 0.38em;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-radius: 1px;
+      touch-action: manipulation;
+    }
+    .btn:hover, .btn:active { background: var(--sage-dark); }
+    .btn:active { transform: scale(0.99); }
+
+    /* ── CONFIRMATION ─────────────────────────── */
+    .confirm {
+      text-align: center;
+      padding: 8px 0 0;
+    }
+    .confirm-ring {
+      width: 50px; height: 50px;
+      background: #EDF4EE;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+    }
+    .confirm h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(24px, 6vw, 30px);
+      color: var(--forest);
+      margin-bottom: 10px;
+    }
+    .confirm p {
+      font-size: clamp(13px, 3.5vw, 15px);
+      font-weight: 300;
+      color: var(--ink-light);
+      line-height: 1.75;
+    }
+
+    /* ── WHO'S COMING SECTION ─────────────────── */
+    .guests-section { width: 100%; }
+    .guests-header {
+      text-align: center;
+      margin-bottom: clamp(16px, 4vw, 24px);
+    }
+    .guests-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(26px, 6vw, 34px);
+      color: var(--forest);
+      margin-bottom: 6px;
+    }
+    .guests-header p {
+      font-family: 'Cormorant SC', serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      color: var(--ink-light);
+    }
+
+    .guest-list {
+      list-style: none;
+    }
+    .guest-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(12px, 3vw, 15px) 0;
+      border-bottom: 1px solid #F0EBE2;
+      animation: fadeUp 0.3s ease both;
+    }
+    .guest-item:last-child { border-bottom: none; }
+    .guest-name-cell {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(17px, 4vw, 20px);
+      color: var(--ink);
+      font-weight: 400;
+    }
+    .badge {
+      font-family: 'Cormorant SC', serif;
+      font-size: clamp(8px, 2vw, 9px);
+      letter-spacing: 0.22em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+    .badge.attending { background: #DFF0E0; color: var(--sage-dark); }
+    .badge.declined  { background: #F5E8E3; color: #8B5E52; }
+
+    .guests-empty {
+      text-align: center;
+      padding: 40px 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(17px, 4.5vw, 20px);
+      color: var(--border);
+    }
+
+    /* ── ADMIN LINK ───────────────────────────── */
+    .footer-admin {
+      text-align: center;
+      padding: 8px 0 40px;
+    }
+    .admin-trigger {
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: var(--cream);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .admin-trigger:hover { color: var(--sage); }
+
+    /* ── ADMIN LOGIN ──────────────────────────── */
+    .admin-login-col {
+      width: 100%;
+      max-width: 400px;
+      padding: clamp(40px, 8vw, 64px) clamp(16px, 5vw, 24px) 72px;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--sage);
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 24px;
+      padding: 0;
+    }
+    .back:hover { color: var(--forest); }
+
+    .login-err {
+      font-size: 13px;
+      color: #b05050;
+      text-align: center;
+      margin-top: 12px;
+      display: none;
+    }
+    .login-err.show { display: block; }
+
+    /* ── ADMIN PANEL ──────────────────────────── */
+    .admin-col {
+      width: 100%;
+      max-width: 900px;
+      padding: clamp(32px, 6vw, 56px) clamp(16px, 4vw, 28px) 72px;
+    }
+
+    .admin-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: clamp(20px, 5vw, 32px);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-top h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(28px, 6vw, 40px);
+      color: var(--forest);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .admin-top p {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--ink-light);
+    }
+    .sign-out {
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      color: var(--ink-light);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 1px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .sign-out:hover { border-color: var(--sage); color: var(--sage-dark); }
+
+    /* ── STATS ────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(8px, 2vw, 14px);
+      margin-bottom: clamp(20px, 5vw, 32px);
+    }
+    .stat {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: clamp(14px, 4vw, 22px) clamp(12px, 3vw, 24px);
+      text-align: center;
+      border-radius: 1px;
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(32px, 8vw, 46px);
+      font-weight: 300;
+      color: var(--forest);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-family: 'Cormorant SC', serif;
+      font-size: clamp(8px, 2vw, 9.5px);
+      letter-spacing: 0.28em;
+      color: var(--sage-dark);
+    }
+    .stat.s-att .stat-num { color: var(--sage-dark); }
+    .stat.s-dec .stat-num { color: #9b7b6b; }
+
+    /* ── FILTER TABS ──────────────────────────── */
+    .tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 1px;
+      overflow: hidden;
+      width: fit-content;
+      margin-bottom: clamp(14px, 4vw, 22px);
+      background: var(--white);
+    }
+    .tab {
+      padding: clamp(8px, 2.5vw, 10px) clamp(14px, 4vw, 22px);
+      font-family: 'Cormorant SC', serif;
+      font-size: clamp(9px, 2.2vw, 10.5px);
+      letter-spacing: 0.25em;
+      color: var(--ink-light);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab + .tab { border-left: 1px solid var(--border); }
+    .tab.on { background: var(--forest); color: var(--parchment); }
+
+    /* ── ADMIN TABLE ──────────────────────────── */
+    .tbl-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 1px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+    thead th {
+      font-family: 'Cormorant SC', serif;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--sage-dark);
+      background: #F0EBE2;
+      padding: clamp(10px, 2.5vw, 13px) clamp(12px, 3vw, 18px);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: clamp(12px, 3vw, 16px) clamp(12px, 3vw, 18px);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(15px, 3.5vw, 17px);
+      color: var(--ink);
+      border-bottom: 1px solid #F0EBE2;
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #FAF7F2; }
+
+    .td-meta {
+      font-size: clamp(12px, 3vw, 13.5px);
+      color: var(--ink-light);
+      margin-top: 2px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+    }
+    .td-msg {
+      font-size: clamp(13px, 3.5vw, 15px);
+      color: var(--ink-light);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .del-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--border);
+      transition: color 0.2s;
+      padding: 4px;
+      line-height: 1;
+    }
+    .del-btn:hover { color: #b05050; }
+
+    .tbl-empty {
+      text-align: center;
+      padding: clamp(40px, 8vw, 64px) 24px;
+    }
+    .tbl-empty p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(18px, 4vw, 22px);
+      color: var(--border);
+    }
+
+    /* ── TOAST ────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: clamp(20px, 5vw, 32px);
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--forest);
+      color: var(--parchment);
+      font-family: 'Cormorant SC', serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      padding: 13px 28px;
+      border-radius: 1px;
+      z-index: 999;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.up { transform: translateX(-50%) translateY(0); }
+
+    /* ── ANIMATION ────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE OVERRIDES (<480px) ────────────── */
+    @media (max-width: 480px) {
+      .att-row { grid-template-columns: 1fr; }
+      .att-opt label { padding: 14px 12px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stats .stat:last-child { grid-column: 1 / -1; }
+      table { min-width: 440px; }
+    }
+
+    /* ── LAPTOP / WIDE (>900px) ───────────────── */
+    @media (min-width: 900px) {
+      .view.active { align-items: center; }
+      .hero { max-width: 860px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Botanical corners -->
+<div class="bg-flora" aria-hidden="true">
+  <svg class="fl-tl" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/>
+    <ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/>
+    <ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/>
+    <ellipse cx="75" cy="205" rx="40" ry="62" fill="#6B8F71" transform="rotate(16 75 205)"/>
+    <ellipse cx="265" cy="105" rx="36" ry="56" fill="#6B8F71" transform="rotate(-52 265 105)"/>
+    <circle cx="158" cy="58" r="46" fill="#6B8F71"/>
+    <circle cx="242" cy="184" r="36" fill="#6B8F71"/>
+    <path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M202 182 Q180 242 160 314" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M118 184 Q86 254 66 322" stroke="#3D5A42" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="128" cy="242" rx="22" ry="37" fill="#6B8F71" transform="rotate(30 128 242)"/>
+    <ellipse cx="103" cy="292" rx="18" ry="28" fill="#6B8F71" transform="rotate(-16 103 292)"/>
+    <ellipse cx="172" cy="262" rx="20" ry="31" fill="#6B8F71" transform="rotate(42 172 262)"/>
+    <circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/>
+    <circle cx="168" cy="62" r="21" fill="#EDE8DE" opacity="0.55"/>
+    <circle cx="168" cy="62" r="13" fill="#EDE8DE" opacity="0.4"/>
+  </svg>
+  <svg class="fl-tr" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/>
+    <ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/>
+    <ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/>
+    <ellipse cx="75" cy="205" rx="40" ry="62" fill="#6B8F71" transform="rotate(16 75 205)"/>
+    <circle cx="158" cy="58" r="46" fill="#6B8F71"/>
+    <circle cx="242" cy="184" r="36" fill="#6B8F71"/>
+    <path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="128" cy="242" rx="22" ry="37" fill="#6B8F71" transform="rotate(30 128 242)"/>
+    <ellipse cx="172" cy="262" rx="20" ry="31" fill="#6B8F71" transform="rotate(42 172 262)"/>
+    <circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/>
+    <circle cx="168" cy="62" r="20" fill="#EDE8DE" opacity="0.45"/>
+  </svg>
+  <svg class="fl-bl" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/>
+    <ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/>
+    <ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/>
+    <ellipse cx="158" cy="342" rx="36" ry="54" fill="#6B8F71" transform="rotate(-12 158 342)"/>
+    <path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M148 262 Q126 210 98 168" stroke="#3D5A42" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="242" cy="202" rx="20" ry="33" fill="#6B8F71" transform="rotate(-26 242 202)"/>
+    <circle cx="200" cy="312" r="26" fill="#EDE8DE" opacity="0.6"/>
+    <circle cx="200" cy="312" r="16" fill="#EDE8DE" opacity="0.42"/>
+  </svg>
+  <svg class="fl-br" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/>
+    <ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/>
+    <ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/>
+    <ellipse cx="158" cy="342" rx="36" ry="54" fill="#6B8F71" transform="rotate(-12 158 342)"/>
+    <path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="242" cy="202" rx="20" ry="33" fill="#6B8F71" transform="rotate(-26 242 202)"/>
+    <circle cx="200" cy="312" r="28" fill="#EDE8DE" opacity="0.6"/>
+    <circle cx="200" cy="312" r="18" fill="#EDE8DE" opacity="0.42"/>
+  </svg>
+</div>
+
+<div id="app">
+
+  <!-- ══════════════════════════════════════════
+       VIEW — RSVP
+  ══════════════════════════════════════════ -->
+  <div id="v-rsvp" class="view active">
+    <div class="hero">
+      <p class="hero-eyebrow">You are warmly invited to celebrate</p>
+      <h1 class="hero-names">Beth <span class="hero-amp">&amp;</span> Damian</h1>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <span class="ornament-leaf">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg>
+        </span>
+        <div class="ornament-line r"></div>
+      </div>
+      <p class="hero-date">Kindly reply by the 1st of September</p>
+    </div>
+
+    <div class="col">
+
+      <!-- RSVP CARD -->
+      <div class="card">
+        <p class="card-eyebrow">RSVP</p>
+
+        <div id="form-body">
+          <div class="field">
+            <label for="f-name">Your Full Name</label>
+            <input type="text" id="f-name" placeholder="First and last name" autocomplete="name"/>
+          </div>
+
+          <div class="field">
+            <label for="f-email">Email Address</label>
+            <input type="email" id="f-email" placeholder="your@email.com" autocomplete="email"/>
+          </div>
+
+          <div>
+            <span class="att-legend">Will you be attending?</span>
+            <div class="att-row">
+              <div class="att-opt">
+                <input type="radio" name="att" id="att-y" value="attending"/>
+                <label for="att-y"><span class="att-dot"></span>Accept with Pleasure</label>
+              </div>
+              <div class="att-opt">
+                <input type="radio" name="att" id="att-n" value="declined"/>
+                <label for="att-n"><span class="att-dot"></span>Decline with Regret</label>
+              </div>
+            </div>
+          </div>
+
+          <div id="meal-wrap" style="display:none;">
+            <div class="meal-note">
+              <p>We would kindly ask guests to contribute half towards a three-course meal. The meal is not mandatory, but we would love for you to join us.</p>
+            </div>
+            <div class="field">
+              <label>Will you be joining for the meal?</label>
+              <select id="f-meal">
+                <option value="">Please select…</option>
+                <option value="yes">Yes, I would love to join</option>
+                <option value="no">No thank you</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-msg">Message to Beth &amp; Damian <span style="opacity:.5;font-size:.85em;">(optional)</span></label>
+            <textarea id="f-msg" placeholder="Any well wishes or notes…"></textarea>
+          </div>
+
+          <button class="btn" id="submit-btn">SEND MY RSVP</button>
+        </div>
+
+        <div class="confirm" id="confirm-wrap" style="display:none;">
+          <div class="confirm-ring">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A9E82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Thank you so much</h3>
+          <p id="confirm-msg"></p>
+        </div>
+      </div>
+
+      <!-- WHO'S RESPONDED -->
+      <div class="guests-section">
+        <div class="card-eyebrow" style="margin-bottom:0;">
+          <div class="ornament" style="margin:0 auto 10px;"><div class="ornament-line"></div><span class="ornament-leaf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg></span><div class="ornament-line r"></div></div>
+        </div>
+        <div class="guests-header">
+          <h2>Who has responded</h2>
+          <p>Guests who have sent their RSVP</p>
+        </div>
+        <div class="card" style="padding: clamp(16px,5vw,28px) clamp(20px,6vw,36px);">
+          <ul class="guest-list" id="guest-list">
+            <li class="guests-empty" id="guest-empty">No responses yet — be the first!</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-admin">
+      <button class="admin-trigger" onclick="showView('v-login')">Admin</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VIEW — ADMIN LOGIN
+  ══════════════════════════════════════════ -->
+  <div id="v-login" class="view">
+    <div class="admin-login-col">
+      <button class="back" onclick="showView('v-rsvp')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div class="card">
+        <p class="card-eyebrow">ADMIN ACCESS</p>
+        <div class="field">
+          <label for="a-pass">Password</label>
+          <input type="password" id="a-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"/>
+        </div>
+        <button class="btn" onclick="login()">ENTER</button>
+        <p class="login-err" id="login-err">Incorrect password. Please try again.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VIEW — ADMIN PANEL
+  ══════════════════════════════════════════ -->
+  <div id="v-admin" class="view">
+    <div class="admin-col">
+      <button class="back" onclick="showView('v-rsvp')" style="margin-bottom:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to RSVP page
+      </button>
+      <div class="admin-top">
+        <div>
+          <h1>Guest Responses</h1>
+          <p>Beth &amp; Damian's Wedding</p>
+        </div>
+        <button class="sign-out" onclick="showView('v-rsvp')">SIGN OUT</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num" id="s-total">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat s-att">
+          <div class="stat-num" id="s-att">0</div>
+          <div class="stat-label">Attending</div>
+        </div>
+        <div class="stat s-dec">
+          <div class="stat-num" id="s-dec">0</div>
+          <div class="stat-label">Declined</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab on" onclick="setFilter('all',this)">All</button>
+        <button class="tab" onclick="setFilter('attending',this)">Attending</button>
+        <button class="tab" onclick="setFilter('declined',this)">Declined</button>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name &amp; Email</th>
+              <th>Status</th>
+              <th>Meal</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="a-tbody"></tbody>
+        </table>
+        <div class="tbl-empty" id="tbl-empty" style="display:none;"><p>No responses yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  /* ── CONFIG ───────────────────────────────── */
+  const PWD = 'BethDamian2025'; // ← Change this password before going live
+  const KEY = 'bd_rsvps';
+
+  /* ── STORAGE ──────────────────────────────── */
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+  const save = d => localStorage.setItem(KEY, JSON.stringify(d));
+
+  /* ── VIEW ROUTER ──────────────────────────── */
+  let filter = 'all';
+  function showView(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (id === 'v-rsvp') renderGuestList();
+    if (id === 'v-admin') renderAdmin();
+  }
+
+  /* ── MEAL TOGGLE ──────────────────────────── */
+  document.querySelectorAll('input[name="att"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('meal-wrap').style.display = r.value === 'attending' ? 'block' : 'none';
+    });
+  });
+
+  /* ── SUBMIT RSVP ──────────────────────────── */
+  document.getElementById('submit-btn').addEventListener('click', () => {
+    const name  = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const att   = document.querySelector('input[name="att"]:checked');
+    const meal  = document.getElementById('f-meal').value;
+    const msg   = document.getElementById('f-msg').value.trim();
+
+    if (!name)  { toast('Please enter your name'); return; }
+    if (!att)   { toast('Please choose your attendance'); return; }
+
+    const record = {
+      id:     Date.now().toString(),
+      name,
+      email,
+      status: att.value,
+      meal:   att.value === 'attending' ? meal : '',
+      msg,
+      date:   new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+
+    const all = load();
+    all.unshift(record);
+    save(all);
+
+    document.getElementById('form-body').style.display = 'none';
+    const c = document.getElementById('confirm-wrap');
+    c.style.display = 'block';
+    document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
+      ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
+      : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
+
+    renderGuestList();
+  });
+
+  /* ── PUBLIC GUEST LIST ────────────────────── */
+  function renderGuestList() {
+    const all   = load();
+    const list  = document.getElementById('guest-list');
+    const empty = document.getElementById('guest-empty');
+    if (all.length === 0) {
+      list.innerHTML = '';
+      list.appendChild(empty);
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    list.innerHTML = all.map((r, i) => `
+      <li class="guest-item" style="animation-delay:${i * 0.04}s">
+        <span class="guest-name-cell">${esc(r.name)}</span>
+        <span class="badge ${r.status}">${r.status === 'attending' ? 'Attending' : 'Declined'}</span>
+      </li>
+    `).join('');
+  }
+
+  /* ── ADMIN LOGIN ──────────────────────────── */
+  function login() {
+    const v = document.getElementById('a-pass').value;
+    const e = document.getElementById('login-err');
+    if (v === PWD) {
+      e.classList.remove('show');
+      document.getElementById('a-pass').value = '';
+      showView('v-admin');
+    } else {
+      e.classList.add('show');
+    }
+  }
+
+  /* ── FILTER ───────────────────────────────── */
+  function setFilter(f, btn) {
+    filter = f;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+    btn.classList.add('on');
+    renderAdmin();
+  }
+
+  /* ── ADMIN RENDER ─────────────────────────── */
+  function renderAdmin() {
+    const all = load();
+    const att = all.filter(r => r.status === 'attending');
+    const dec = all.filter(r => r.status === 'declined');
+    document.getElementById('s-total').textContent = all.length;
+    document.getElementById('s-att').textContent   = att.length;
+    document.getElementById('s-dec').textContent   = dec.length;
+
+    const rows = filter === 'all' ? all : filter === 'attending' ? att : dec;
+    const tbody = document.getElementById('a-tbody');
+    const empty = document.getElementById('tbl-empty');
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td>
+          <div>${esc(r.name)}</div>
+          ${r.email ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
+          ${r.msg   ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
+        </td>
+        <td><span class="badge ${r.status}">${r.status === 'attending' ? 'Attending' : 'Declined'}</span></td>
+        <td style="font-size:clamp(13px,3.5vw,15px);">
+          ${r.meal === 'yes' ? 'Joining meal' : r.meal === 'no' ? 'Not joining' : '—'}
+        </td>
+        <td style="font-size:clamp(12px,3vw,14px);color:var(--ink-light);font-family:'Jost',sans-serif;font-weight:300;white-space:nowrap;">${r.date}</td>
+        <td>
+          <button class="del-btn" onclick="delRSVP('${r.id}')" title="Remove guest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  /* ── DELETE ───────────────────────────────── */
+  function delRSVP(id) {
+    if (!confirm('Remove this guest response?')) return;
+    save(load().filter(r => r.id !== id));
+    renderAdmin();
+    toast('Response removed');
+  }
+
+  /* ── UTILS ────────────────────────────────── */
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  let toastTimer;
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('up');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('up'), 3000);
+  }
+
+  /* ── INIT ─────────────────────────────────── */
+  renderGuestList();
+</script>
+</body>
+</html>
