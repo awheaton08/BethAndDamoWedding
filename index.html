@@ -1,845 +1,454 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Beth & Damian — RSVP</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <title>Beth & Damian — Our Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cormorant+SC:wght@300;400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --parchment:  #F7F3EC;
-      --cream:      #EDE8DE;
-      --sage:       #7A9E82;
-      --sage-light: #A8C5AD;
-      --sage-dark:  #3D5A42;
-      --forest:     #2A3D2E;
-      --ink:        #2C2B29;
-      --ink-light:  #6A6760;
-      --border:     #D4CCBC;
-      --white:      #FFFFFF;
+      --parchment: #F7F3EC; --cream: #EDE8DE; --sage: #7A9E82;
+      --sage-light: #A8C5AD; --sage-dark: #3D5A42; --forest: #2A3D2E;
+      --ink: #2C2B29; --ink-light: #6A6760; --border: #D4CCBC; --white: #FFFFFF;
     }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { min-height: 100vh; background: var(--parchment); font-family: 'Jost', sans-serif; color: var(--ink); overflow-x: hidden; }
 
-    html {
-      scroll-behavior: smooth;
-      -webkit-text-size-adjust: 100%;
-    }
+    /* BOTANICAL BG */
+    .bg-flora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .bg-flora svg { position: absolute; opacity: 0.13; }
+    .bg-flora .fl-tl { top: -40px; left: -40px; width: min(340px, 48vw); }
+    .bg-flora .fl-tr { top: -40px; right: -40px; width: min(300px, 44vw); transform: scaleX(-1); }
+    .bg-flora .fl-bl { bottom: -40px; left: -30px; width: min(280px, 42vw); transform: scaleY(-1); }
+    .bg-flora .fl-br { bottom: -40px; right: -30px; width: min(320px, 46vw); transform: scale(-1,-1); }
 
-    body {
-      min-height: 100vh;
-      background-color: var(--parchment);
-      font-family: 'Jost', sans-serif;
-      color: var(--ink);
-      overflow-x: hidden;
-    }
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(247,243,236,0.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1000px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(16px,4vw,32px); height: 56px; }
+    .nav-brand { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(18px,4vw,22px); color: var(--forest); cursor: pointer; flex-shrink: 0; text-decoration: none; }
+    .nav-links { display: flex; gap: 0; }
+    .nav-btn { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(7.5px,1.9vw,10px); letter-spacing: 0.26em; color: var(--ink-light); background: none; border: none; cursor: pointer; padding: clamp(5px,1.5vw,8px) clamp(7px,1.8vw,13px); border-radius: 1px; transition: all 0.2s; white-space: nowrap; }
+    .nav-btn:hover { color: var(--forest); background: var(--cream); }
+    .nav-btn.active { color: var(--forest); background: var(--cream); }
 
-    /* ── BOTANICAL BACKGROUND ─────────────────── */
-    .bg-flora {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .bg-flora svg {
-      position: absolute;
-      opacity: 0.15;
-    }
-    .bg-flora .fl-tl { top: -40px; left: -40px; width: min(380px, 55vw); }
-    .bg-flora .fl-tr { top: -40px; right: -40px; width: min(340px, 50vw); transform: scaleX(-1); }
-    .bg-flora .fl-bl { bottom: -40px; left: -30px; width: min(320px, 48vw); transform: scaleY(-1); }
-    .bg-flora .fl-br { bottom: -40px; right: -30px; width: min(360px, 52vw); transform: scale(-1,-1); }
+    /* LAYOUT */
+    #app { position: relative; z-index: 1; min-height: 100vh; }
+    .page { display: none; }
+    .page.active { display: block; }
 
-    /* ── LAYOUT ───────────────────────────────── */
-    #app {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .view { display: none; width: 100%; }
-    .view.active { display: flex; flex-direction: column; align-items: center; }
-
-    /* ── HERO ─────────────────────────────────── */
-    .hero {
-      text-align: center;
-      padding: clamp(40px, 8vw, 72px) clamp(20px, 5vw, 40px) clamp(28px, 5vw, 40px);
-      width: 100%;
-    }
-    .hero-eyebrow {
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: clamp(9px, 2.2vw, 11px);
-      letter-spacing: 0.38em;
-      color: var(--sage-dark);
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .hero-names {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      font-size: clamp(48px, 12vw, 92px);
-      line-height: 1.0;
-      color: var(--forest);
-      letter-spacing: -0.01em;
-    }
+    /* HERO */
+    .hero { text-align: center; padding: clamp(44px,9vw,80px) clamp(20px,5vw,40px) clamp(28px,5vw,44px); }
+    .eyebrow { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(9px,2.2vw,11px); letter-spacing: 0.38em; color: var(--sage-dark); margin-bottom: 14px; }
+    .hero-names { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(48px,11vw,90px); line-height: 1; color: var(--forest); }
     .hero-amp { color: var(--sage); }
+    .ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin: clamp(16px,4vw,26px) auto; max-width: 240px; }
+    .orn-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--border)); }
+    .orn-line.r { background: linear-gradient(to left, transparent, var(--border)); }
+    .orn-leaf { color: var(--sage-light); flex-shrink: 0; }
+    .hero-sub { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(10px,2.5vw,12px); letter-spacing: 0.28em; color: var(--ink-light); }
 
-    .ornament {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      margin: clamp(18px, 4vw, 28px) auto;
-      max-width: 260px;
-    }
-    .ornament-line {
-      flex: 1; height: 1px;
-      background: linear-gradient(to right, transparent, var(--border));
-    }
-    .ornament-line.r { background: linear-gradient(to left, transparent, var(--border)); }
-    .ornament-leaf { color: var(--sage-light); flex-shrink: 0; }
+    /* PAGE HERO */
+    .page-hero { text-align: center; padding: clamp(36px,7vw,64px) clamp(20px,5vw,40px) clamp(20px,4vw,36px); }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(38px,8vw,64px); color: var(--forest); line-height: 1; margin-bottom: 10px; }
+    .page-sub { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(9px,2.2vw,11px); letter-spacing: 0.32em; color: var(--ink-light); }
 
-    .hero-date {
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: clamp(11px, 2.5vw, 13px);
-      letter-spacing: 0.28em;
-      color: var(--ink-light);
-    }
+    /* WRAPPERS */
+    .wrap { max-width: 680px; margin: 0 auto; padding: 0 clamp(16px,5vw,28px) 80px; }
+    .wrap-wide { max-width: 900px; margin: 0 auto; padding: 0 clamp(16px,4vw,28px) 80px; }
 
-    /* ── CONTENT COLUMN ───────────────────────── */
-    .col {
-      width: 100%;
-      max-width: 580px;
-      padding: 0 clamp(16px, 5vw, 28px) 72px;
-    }
+    /* CARD */
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 2px; padding: clamp(24px,6vw,44px) clamp(20px,6vw,44px); box-shadow: 0 4px 40px rgba(42,61,46,0.06), 0 1px 3px rgba(42,61,46,0.04); margin-bottom: 20px; }
+    .card-label { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: 9.5px; letter-spacing: 0.35em; color: var(--sage-dark); margin-bottom: clamp(16px,4vw,24px); }
 
-    /* ── CARD ─────────────────────────────────── */
-    .card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: clamp(28px, 7vw, 52px) clamp(24px, 7vw, 52px);
-      box-shadow: 0 6px 48px rgba(42,61,46,0.07), 0 1px 4px rgba(42,61,46,0.04);
-      margin-bottom: 24px;
-    }
-    .card-eyebrow {
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: 10px;
-      letter-spacing: 0.35em;
-      color: var(--sage-dark);
-      text-align: center;
-      margin-bottom: clamp(20px, 5vw, 32px);
-    }
+    /* FORM */
+    .field { margin-bottom: clamp(14px,3.5vw,20px); }
+    .field label { display: block; font-family: 'Cormorant SC', serif; font-weight: 300; font-size: 9.5px; letter-spacing: 0.3em; color: var(--sage-dark); margin-bottom: 7px; }
+    .field input, .field select, .field textarea { width: 100%; padding: clamp(10px,3vw,13px) 14px; border: 1px solid var(--border); background: var(--parchment); font-family: 'Cormorant Garamond', serif; font-size: clamp(16px,4vw,18px); color: var(--ink); outline: none; border-radius: 1px; transition: border-color 0.2s; -webkit-appearance: none; appearance: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--sage); }
+    .field textarea { resize: vertical; min-height: 72px; }
 
-    /* ── FORM ELEMENTS ────────────────────────── */
-    .field { margin-bottom: clamp(16px, 4vw, 22px); }
-    .field label {
-      display: block;
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: 9.5px;
-      letter-spacing: 0.32em;
-      color: var(--sage-dark);
-      margin-bottom: 7px;
-    }
-    .field input,
-    .field select,
-    .field textarea {
-      width: 100%;
-      padding: clamp(11px, 3vw, 13px) 14px;
-      border: 1px solid var(--border);
-      background: var(--parchment);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(16px, 4vw, 18px);
-      color: var(--ink);
-      outline: none;
-      border-radius: 1px;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus { border-color: var(--sage); }
-    .field textarea { resize: vertical; min-height: 76px; }
-
-    /* ── ATTENDANCE TOGGLE ────────────────────── */
-    .att-legend {
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: 9.5px;
-      letter-spacing: 0.32em;
-      color: var(--sage-dark);
-      display: block;
-      margin-bottom: 10px;
-    }
-    .att-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: clamp(20px, 5vw, 28px); }
+    /* ATTENDANCE */
+    .att-legend { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: 9.5px; letter-spacing: 0.3em; color: var(--sage-dark); display: block; margin-bottom: 9px; }
+    .att-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: clamp(18px,4vw,26px); }
     .att-opt input[type="radio"] { display: none; }
-    .att-opt label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: clamp(12px, 3vw, 15px) 8px;
-      border: 1px solid var(--border);
-      background: var(--parchment);
-      font-family: 'Cormorant SC', serif;
-      font-weight: 300;
-      font-size: clamp(8.5px, 2vw, 10px);
-      letter-spacing: 0.22em;
-      color: var(--ink-light);
-      cursor: pointer;
-      transition: all 0.2s;
-      border-radius: 1px;
-      text-align: center;
-      line-height: 1.4;
-    }
-    .att-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      display: inline-block;
-      flex-shrink: 0;
-      transition: all 0.2s;
-    }
-    .att-opt input:checked + label {
-      border-color: var(--sage);
-      background: #EDF4EE;
-      color: var(--forest);
-    }
-    .att-opt input:checked + label .att-dot {
-      background: var(--sage);
-      border-color: var(--sage);
-    }
+    .att-opt label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: clamp(12px,3vw,14px) 8px; border: 1px solid var(--border); background: var(--parchment); font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(8px,2vw,9.5px); letter-spacing: 0.2em; color: var(--ink-light); cursor: pointer; transition: all 0.2s; border-radius: 1px; text-align: center; line-height: 1.4; }
+    .att-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--border); display: inline-block; flex-shrink: 0; transition: all 0.2s; }
+    .att-opt input:checked + label { border-color: var(--sage); background: #EDF4EE; color: var(--forest); }
+    .att-opt input:checked + label .att-dot { background: var(--sage); border-color: var(--sage); }
 
-    /* ── MEAL NOTE ────────────────────────────── */
-    .meal-note {
-      background: #EDF4EE;
-      border-left: 2px solid var(--sage-light);
-      padding: 14px 16px;
-      margin-bottom: clamp(16px, 4vw, 22px);
-      border-radius: 1px;
-    }
-    .meal-note p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(14px, 3.5vw, 16px);
-      font-style: italic;
-      color: var(--sage-dark);
-      line-height: 1.65;
-    }
+    /* BUTTONS */
+    .btn { width: 100%; padding: clamp(13px,3.5vw,16px); background: var(--forest); color: var(--parchment); border: none; font-family: 'Cormorant SC', serif; font-weight: 400; font-size: clamp(9.5px,2.5vw,11px); letter-spacing: 0.38em; cursor: pointer; transition: background 0.2s; border-radius: 1px; touch-action: manipulation; }
+    .btn:hover { background: var(--sage-dark); }
 
-    /* ── PRIMARY BUTTON ───────────────────────── */
-    .btn {
-      width: 100%;
-      padding: clamp(14px, 4vw, 17px);
-      background: var(--forest);
-      color: var(--parchment);
-      border: none;
-      font-family: 'Cormorant SC', serif;
-      font-weight: 400;
-      font-size: clamp(10px, 2.5vw, 11.5px);
-      letter-spacing: 0.38em;
-      cursor: pointer;
-      transition: background 0.2s;
-      border-radius: 1px;
-      touch-action: manipulation;
-    }
-    .btn:hover, .btn:active { background: var(--sage-dark); }
-    .btn:active { transform: scale(0.99); }
+    /* CONFIRM */
+    .confirm { text-align: center; padding: 8px 0 0; }
+    .confirm-ring { width: 48px; height: 48px; background: #EDF4EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .confirm h3 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(22px,5.5vw,28px); color: var(--forest); margin-bottom: 8px; }
+    .confirm p { font-size: clamp(13px,3.5vw,15px); font-weight: 300; color: var(--ink-light); line-height: 1.75; }
 
-    /* ── CONFIRMATION ─────────────────────────── */
-    .confirm {
-      text-align: center;
-      padding: 8px 0 0;
-    }
-    .confirm-ring {
-      width: 50px; height: 50px;
-      background: #EDF4EE;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 18px;
-    }
-    .confirm h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      font-size: clamp(24px, 6vw, 30px);
-      color: var(--forest);
-      margin-bottom: 10px;
-    }
-    .confirm p {
-      font-size: clamp(13px, 3.5vw, 15px);
-      font-weight: 300;
-      color: var(--ink-light);
-      line-height: 1.75;
-    }
-
-    /* ── WHO'S COMING SECTION ─────────────────── */
-    .guests-section { width: 100%; }
-    .guests-header {
-      text-align: center;
-      margin-bottom: clamp(16px, 4vw, 24px);
-    }
-    .guests-header h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      font-size: clamp(26px, 6vw, 34px);
-      color: var(--forest);
-      margin-bottom: 6px;
-    }
-    .guests-header p {
-      font-family: 'Cormorant SC', serif;
-      font-size: 10px;
-      letter-spacing: 0.28em;
-      color: var(--ink-light);
-    }
-
-    .guest-list {
-      list-style: none;
-    }
-    .guest-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: clamp(12px, 3vw, 15px) 0;
-      border-bottom: 1px solid #F0EBE2;
-      animation: fadeUp 0.3s ease both;
-    }
+    /* GUEST LIST */
+    .guest-list { list-style: none; }
+    .guest-item { display: flex; align-items: center; justify-content: space-between; padding: clamp(11px,3vw,14px) 0; border-bottom: 1px solid #F0EBE2; animation: fadeUp 0.3s ease both; }
     .guest-item:last-child { border-bottom: none; }
-    .guest-name-cell {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(17px, 4vw, 20px);
-      color: var(--ink);
-      font-weight: 400;
-    }
-    .badge {
-      font-family: 'Cormorant SC', serif;
-      font-size: clamp(8px, 2vw, 9px);
-      letter-spacing: 0.22em;
-      padding: 4px 12px;
-      border-radius: 20px;
-      flex-shrink: 0;
-    }
+    .guest-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(17px,4vw,20px); }
+    .badge { font-family: 'Cormorant SC', serif; font-size: clamp(7.5px,2vw,9px); letter-spacing: 0.2em; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
     .badge.attending { background: #DFF0E0; color: var(--sage-dark); }
-    .badge.declined  { background: #F5E8E3; color: #8B5E52; }
+    .badge.declined { background: #F5E8E3; color: #8B5E52; }
+    .guests-empty { text-align: center; padding: 36px 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(16px,4vw,19px); color: var(--border); }
 
-    .guests-empty {
-      text-align: center;
-      padding: 40px 0;
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: clamp(17px, 4.5vw, 20px);
-      color: var(--border);
-    }
+    /* NOTES */
+    .note { background: #EDF4EE; border-left: 2px solid var(--sage-light); padding: 14px 16px; margin-bottom: clamp(14px,3.5vw,20px); border-radius: 1px; }
+    .note p { font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3.5vw,16px); font-style: italic; color: var(--sage-dark); line-height: 1.65; }
+    .note.amber { background: #FBF5E6; border-color: #D4B483; }
+    .note.amber p { color: #7A5C1E; }
 
-    /* ── ADMIN LINK ───────────────────────────── */
-    .footer-admin {
-      text-align: center;
-      padding: 8px 0 40px;
-    }
-    .admin-trigger {
-      font-family: 'Jost', sans-serif;
-      font-size: 11px;
-      font-weight: 300;
-      letter-spacing: 0.15em;
-      color: var(--cream);
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
+    /* MENU */
+    .menu-intro { font-family: 'Cormorant Garamond', serif; font-size: clamp(15px,3.5vw,17px); color: var(--ink-light); line-height: 1.75; text-align: center; margin-bottom: clamp(20px,5vw,32px); }
+    .menu-section-title { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(9px,2.2vw,11px); letter-spacing: 0.38em; color: var(--sage-dark); margin-bottom: clamp(12px,3vw,18px); }
+    .course-header { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(20px,4.5vw,26px); color: var(--forest); margin-bottom: clamp(10px,2.5vw,14px); padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .menu-item { display: flex; justify-content: space-between; align-items: baseline; padding: clamp(10px,2.5vw,13px) 0; border-bottom: 1px solid #F0EBE2; gap: 16px; }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item-left { flex: 1; }
+    .menu-item-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(17px,4vw,20px); color: var(--ink); }
+    .menu-item-desc { font-family: 'Cormorant Garamond', serif; font-size: clamp(13px,3vw,15px); font-style: italic; color: var(--ink-light); margin-top: 2px; line-height: 1.5; }
+    .menu-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+    .menu-tag { font-family: 'Cormorant SC', serif; font-size: 7.5px; letter-spacing: 0.2em; padding: 3px 9px; border-radius: 20px; background: #EDF4EE; color: var(--sage-dark); }
+    .menu-tag.vg { background: #E8F5E9; color: #2E7D32; }
+    .menu-tag.gf { background: #FFF8E1; color: #F57F17; }
+    .menu-tag.v  { background: #EDE7F6; color: #512DA8; }
+    .menu-price { font-family: 'Cormorant Garamond', serif; font-size: clamp(16px,3.5vw,18px); color: var(--forest); flex-shrink: 0; white-space: nowrap; }
+    .tag-key { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: clamp(14px,3.5vw,20px); }
+    .tag-key-item { display: flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--ink-light); }
+    .drinks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: clamp(16px,4vw,22px); }
+    .drink-card { background: var(--parchment); border: 1px solid var(--border); padding: 16px 18px; border-radius: 1px; }
+    .drink-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(15px,3.5vw,17px); color: var(--ink); margin-bottom: 3px; }
+    .drink-note { font-family: 'Cormorant Garamond', serif; font-size: clamp(12px,3vw,14px); font-style: italic; color: var(--ink-light); }
+
+    /* SCHEDULE */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
+    .tl-item { position: relative; margin-bottom: clamp(20px,5vw,28px); }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot { position: absolute; left: -24px; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--sage); border: 2px solid var(--white); box-shadow: 0 0 0 1px var(--sage); }
+    .tl-time { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: clamp(8.5px,2vw,10px); letter-spacing: 0.3em; color: var(--sage-dark); margin-bottom: 4px; }
+    .tl-event { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px,4vw,22px); color: var(--forest); margin-bottom: 4px; }
+    .tl-detail { font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3.5vw,16px); font-style: italic; color: var(--ink-light); line-height: 1.6; }
+    .tl-placeholder { background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(212,204,188,0.3) 4px, rgba(212,204,188,0.3) 8px); border: 1px dashed var(--border); border-radius: 1px; padding: clamp(18px,4vw,24px); text-align: center; margin-top: clamp(20px,5vw,28px); }
+    .tl-placeholder p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(15px,3.5vw,17px); color: var(--border); }
+
+    /* ACCOMMODATION */
+    .accom-grid { display: grid; gap: 14px; }
+    .accom-card { background: var(--white); border: 1px solid var(--border); border-radius: 2px; padding: clamp(18px,4.5vw,26px) clamp(16px,4.5vw,26px); }
+    .accom-type { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: 9px; letter-spacing: 0.32em; color: var(--sage-dark); margin-bottom: 7px; }
+    .accom-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(20px,5vw,26px); color: var(--forest); margin-bottom: 6px; }
+    .accom-detail { font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3.5vw,16px); font-style: italic; color: var(--ink-light); line-height: 1.65; margin-bottom: 12px; }
+    .accom-price { display: inline-block; font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3.5vw,16px); color: var(--forest); background: #EDF4EE; padding: 5px 14px; border-radius: 20px; }
+    .accom-placeholder { border: 1px dashed var(--border); border-radius: 2px; padding: clamp(24px,6vw,36px); text-align: center; margin-top: 14px; }
+    .accom-placeholder p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(16px,4vw,20px); color: var(--border); }
+
+    /* GALLERY */
+    .gallery-intro { text-align: center; font-family: 'Cormorant Garamond', serif; font-size: clamp(15px,3.5vw,17px); font-style: italic; color: var(--ink-light); line-height: 1.75; margin-bottom: clamp(20px,5vw,32px); }
+    .gallery-upload-zone { border: 1px dashed var(--sage-light); border-radius: 2px; padding: clamp(32px,8vw,56px) clamp(20px,5vw,40px); text-align: center; background: #F0F6F1; margin-bottom: 28px; }
+    .upload-icon { color: var(--sage); margin-bottom: 14px; }
+    .upload-title { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(20px,5vw,26px); color: var(--forest); margin-bottom: 8px; }
+    .upload-sub { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--ink-light); margin-bottom: 20px; line-height: 1.6; }
+    .upload-chips { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .upload-chip { font-family: 'Cormorant SC', serif; font-size: 9px; letter-spacing: 0.28em; padding: 11px 22px; border: 1px solid var(--sage); color: var(--sage-dark); background: var(--white); border-radius: 1px; cursor: not-allowed; opacity: 0.65; }
+    .gallery-coming { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; color: var(--border); text-align: center; margin-top: 14px; }
+    .gallery-section-label { font-family: 'Cormorant SC', serif; font-weight: 300; font-size: 9.5px; letter-spacing: 0.32em; color: var(--sage-dark); margin-bottom: 10px; margin-top: 4px; display: block; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .gallery-ph { aspect-ratio: 1; background: linear-gradient(135deg,#EDF4EE 0%,#E0EDE2 50%,#D4E8D6 100%); border: 1px solid var(--border); border-radius: 1px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .gallery-ph::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(122,158,130,0.08) 8px,rgba(122,158,130,0.08) 16px); }
+    .gallery-ph svg { opacity: 0.22; color: var(--sage-dark); position: relative; z-index: 1; }
+
+    /* ADMIN */
+    .footer-admin { text-align: center; padding: 8px 0 40px; }
+    .admin-trigger { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.15em; color: var(--cream); background: none; border: none; cursor: pointer; transition: color 0.2s; }
     .admin-trigger:hover { color: var(--sage); }
-
-    /* ── ADMIN LOGIN ──────────────────────────── */
-    .admin-login-col {
-      width: 100%;
-      max-width: 400px;
-      padding: clamp(40px, 8vw, 64px) clamp(16px, 5vw, 24px) 72px;
-    }
-
-    .back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'Jost', sans-serif;
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: 0.1em;
-      color: var(--sage);
-      background: none;
-      border: none;
-      cursor: pointer;
-      margin-bottom: 24px;
-      padding: 0;
-    }
-    .back:hover { color: var(--forest); }
-
-    .login-err {
-      font-size: 13px;
-      color: #b05050;
-      text-align: center;
-      margin-top: 12px;
-      display: none;
-    }
-    .login-err.show { display: block; }
-
-    /* ── ADMIN PANEL ──────────────────────────── */
-    .admin-col {
-      width: 100%;
-      max-width: 900px;
-      padding: clamp(32px, 6vw, 56px) clamp(16px, 4vw, 28px) 72px;
-    }
-
-    .admin-top {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: clamp(20px, 5vw, 32px);
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .admin-top h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-style: italic;
-      font-size: clamp(28px, 6vw, 40px);
-      color: var(--forest);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .admin-top p {
-      font-size: 12px;
-      font-weight: 300;
-      color: var(--ink-light);
-    }
-    .sign-out {
-      font-family: 'Jost', sans-serif;
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.15em;
-      color: var(--ink-light);
-      background: none;
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      cursor: pointer;
-      border-radius: 1px;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
+    .admin-col { max-width: 960px; margin: 0 auto; padding: clamp(32px,6vw,56px) clamp(16px,4vw,28px) 80px; }
+    .admin-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: clamp(20px,5vw,32px); gap: 12px; flex-wrap: wrap; }
+    .admin-top h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(28px,6vw,40px); color: var(--forest); line-height: 1; margin-bottom: 4px; }
+    .admin-top p { font-size: 12px; font-weight: 300; color: var(--ink-light); }
+    .sign-out { font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 0.15em; color: var(--ink-light); background: none; border: 1px solid var(--border); padding: 8px 16px; cursor: pointer; border-radius: 1px; transition: all 0.2s; flex-shrink: 0; }
     .sign-out:hover { border-color: var(--sage); color: var(--sage-dark); }
-
-    /* ── STATS ────────────────────────────────── */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: clamp(8px, 2vw, 14px);
-      margin-bottom: clamp(20px, 5vw, 32px);
-    }
-    .stat {
-      background: var(--white);
-      border: 1px solid var(--border);
-      padding: clamp(14px, 4vw, 22px) clamp(12px, 3vw, 24px);
-      text-align: center;
-      border-radius: 1px;
-    }
-    .stat-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(32px, 8vw, 46px);
-      font-weight: 300;
-      color: var(--forest);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .stat-label {
-      font-family: 'Cormorant SC', serif;
-      font-size: clamp(8px, 2vw, 9.5px);
-      letter-spacing: 0.28em;
-      color: var(--sage-dark);
-    }
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: clamp(8px,2vw,14px); margin-bottom: clamp(20px,5vw,32px); }
+    .stat { background: var(--white); border: 1px solid var(--border); padding: clamp(14px,4vw,22px); text-align: center; border-radius: 1px; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px,8vw,46px); font-weight: 300; color: var(--forest); line-height: 1; margin-bottom: 4px; }
+    .stat-lbl { font-family: 'Cormorant SC', serif; font-size: clamp(8px,2vw,9.5px); letter-spacing: 0.28em; color: var(--sage-dark); }
     .stat.s-att .stat-num { color: var(--sage-dark); }
     .stat.s-dec .stat-num { color: #9b7b6b; }
-
-    /* ── FILTER TABS ──────────────────────────── */
-    .tabs {
-      display: flex;
-      border: 1px solid var(--border);
-      border-radius: 1px;
-      overflow: hidden;
-      width: fit-content;
-      margin-bottom: clamp(14px, 4vw, 22px);
-      background: var(--white);
-    }
-    .tab {
-      padding: clamp(8px, 2.5vw, 10px) clamp(14px, 4vw, 22px);
-      font-family: 'Cormorant SC', serif;
-      font-size: clamp(9px, 2.2vw, 10.5px);
-      letter-spacing: 0.25em;
-      color: var(--ink-light);
-      background: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab + .tab { border-left: 1px solid var(--border); }
+    .tabs { display: flex; border: 1px solid var(--border); border-radius: 1px; overflow: hidden; width: fit-content; margin-bottom: clamp(14px,4vw,20px); background: var(--white); }
+    .tab { padding: clamp(8px,2.5vw,10px) clamp(14px,4vw,20px); font-family: 'Cormorant SC', serif; font-size: clamp(9px,2.2vw,10.5px); letter-spacing: 0.25em; color: var(--ink-light); background: none; border: none; cursor: pointer; transition: all 0.2s; }
+    .tab+.tab { border-left: 1px solid var(--border); }
     .tab.on { background: var(--forest); color: var(--parchment); }
-
-    /* ── ADMIN TABLE ──────────────────────────── */
-    .tbl-wrap {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 1px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 500px;
-    }
-    thead th {
-      font-family: 'Cormorant SC', serif;
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      color: var(--sage-dark);
-      background: #F0EBE2;
-      padding: clamp(10px, 2.5vw, 13px) clamp(12px, 3vw, 18px);
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    tbody td {
-      padding: clamp(12px, 3vw, 16px) clamp(12px, 3vw, 18px);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(15px, 3.5vw, 17px);
-      color: var(--ink);
-      border-bottom: 1px solid #F0EBE2;
-      vertical-align: top;
-    }
+    .tbl-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    thead th { font-family: 'Cormorant SC', serif; font-size: 9px; letter-spacing: 0.3em; color: var(--sage-dark); background: #F0EBE2; padding: clamp(10px,2.5vw,13px) clamp(12px,3vw,18px); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    tbody td { padding: clamp(12px,3vw,15px) clamp(12px,3vw,18px); font-family: 'Cormorant Garamond', serif; font-size: clamp(15px,3.5vw,17px); color: var(--ink); border-bottom: 1px solid #F0EBE2; vertical-align: top; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover td { background: #FAF7F2; }
-
-    .td-meta {
-      font-size: clamp(12px, 3vw, 13.5px);
-      color: var(--ink-light);
-      margin-top: 2px;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-    }
-    .td-msg {
-      font-size: clamp(13px, 3.5vw, 15px);
-      color: var(--ink-light);
-      margin-top: 4px;
-      font-style: italic;
-    }
-
-    .del-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--border);
-      transition: color 0.2s;
-      padding: 4px;
-      line-height: 1;
-    }
+    .td-meta { font-size: clamp(11px,3vw,13px); color: var(--ink-light); margin-top: 2px; font-family: 'Jost', sans-serif; font-weight: 300; }
+    .td-msg { font-size: clamp(13px,3.5vw,14px); color: var(--ink-light); margin-top: 4px; font-style: italic; }
+    .del-btn { background: none; border: none; cursor: pointer; color: var(--border); transition: color 0.2s; padding: 4px; }
     .del-btn:hover { color: #b05050; }
+    .tbl-empty { text-align: center; padding: clamp(40px,8vw,60px) 24px; }
+    .tbl-empty p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(17px,4vw,20px); color: var(--border); }
 
-    .tbl-empty {
-      text-align: center;
-      padding: clamp(40px, 8vw, 64px) 24px;
-    }
-    .tbl-empty p {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: clamp(18px, 4vw, 22px);
-      color: var(--border);
-    }
+    /* LOGIN */
+    .login-col { max-width: 400px; margin: 0 auto; padding: clamp(40px,9vw,72px) clamp(16px,5vw,24px) 72px; }
+    .login-err { font-size: 13px; color: #b05050; text-align: center; margin-top: 12px; display: none; }
+    .login-err.show { display: block; }
+    .back { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.1em; color: var(--sage); background: none; border: none; cursor: pointer; margin-bottom: 24px; padding: 0; }
+    .back:hover { color: var(--forest); }
 
-    /* ── TOAST ────────────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: clamp(20px, 5vw, 32px);
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: var(--forest);
-      color: var(--parchment);
-      font-family: 'Cormorant SC', serif;
-      font-size: 10px;
-      letter-spacing: 0.3em;
-      padding: 13px 28px;
-      border-radius: 1px;
-      z-index: 999;
-      transition: transform 0.3s ease;
-      white-space: nowrap;
-      pointer-events: none;
-    }
+    /* TOAST */
+    .toast { position: fixed; bottom: clamp(20px,5vw,32px); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--forest); color: var(--parchment); font-family: 'Cormorant SC', serif; font-size: 10px; letter-spacing: 0.3em; padding: 12px 26px; border-radius: 1px; z-index: 999; transition: transform 0.3s ease; white-space: nowrap; pointer-events: none; }
     .toast.up { transform: translateX(-50%) translateY(0); }
 
-    /* ── ANIMATION ────────────────────────────── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-    /* ── MOBILE OVERRIDES (<480px) ────────────── */
-    @media (max-width: 480px) {
+    @media (max-width: 500px) {
       .att-row { grid-template-columns: 1fr; }
-      .att-opt label { padding: 14px 12px; }
+      .drinks-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2,1fr); }
       .stats { grid-template-columns: 1fr 1fr; }
-      .stats .stat:last-child { grid-column: 1 / -1; }
-      table { min-width: 440px; }
+      .stats .stat:last-child { grid-column: 1/-1; }
     }
-
-    /* ── LAPTOP / WIDE (>900px) ───────────────── */
-    @media (min-width: 900px) {
-      .view.active { align-items: center; }
-      .hero { max-width: 860px; }
+    @media (min-width: 700px) {
+      .accom-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-grid { grid-template-columns: repeat(4,1fr); }
     }
   </style>
 </head>
 <body>
 
-<!-- Botanical corners -->
 <div class="bg-flora" aria-hidden="true">
-  <svg class="fl-tl" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/>
-    <ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/>
-    <ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/>
-    <ellipse cx="75" cy="205" rx="40" ry="62" fill="#6B8F71" transform="rotate(16 75 205)"/>
-    <ellipse cx="265" cy="105" rx="36" ry="56" fill="#6B8F71" transform="rotate(-52 265 105)"/>
-    <circle cx="158" cy="58" r="46" fill="#6B8F71"/>
-    <circle cx="242" cy="184" r="36" fill="#6B8F71"/>
-    <path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M202 182 Q180 242 160 314" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M118 184 Q86 254 66 322" stroke="#3D5A42" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="128" cy="242" rx="22" ry="37" fill="#6B8F71" transform="rotate(30 128 242)"/>
-    <ellipse cx="103" cy="292" rx="18" ry="28" fill="#6B8F71" transform="rotate(-16 103 292)"/>
-    <ellipse cx="172" cy="262" rx="20" ry="31" fill="#6B8F71" transform="rotate(42 172 262)"/>
-    <circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/>
-    <circle cx="168" cy="62" r="21" fill="#EDE8DE" opacity="0.55"/>
-    <circle cx="168" cy="62" r="13" fill="#EDE8DE" opacity="0.4"/>
-  </svg>
-  <svg class="fl-tr" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/>
-    <ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/>
-    <ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/>
-    <ellipse cx="75" cy="205" rx="40" ry="62" fill="#6B8F71" transform="rotate(16 75 205)"/>
-    <circle cx="158" cy="58" r="46" fill="#6B8F71"/>
-    <circle cx="242" cy="184" r="36" fill="#6B8F71"/>
-    <path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <ellipse cx="128" cy="242" rx="22" ry="37" fill="#6B8F71" transform="rotate(30 128 242)"/>
-    <ellipse cx="172" cy="262" rx="20" ry="31" fill="#6B8F71" transform="rotate(42 172 262)"/>
-    <circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/>
-    <circle cx="168" cy="62" r="20" fill="#EDE8DE" opacity="0.45"/>
-  </svg>
-  <svg class="fl-bl" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/>
-    <ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/>
-    <ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/>
-    <ellipse cx="158" cy="342" rx="36" ry="54" fill="#6B8F71" transform="rotate(-12 158 342)"/>
-    <path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M148 262 Q126 210 98 168" stroke="#3D5A42" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <ellipse cx="242" cy="202" rx="20" ry="33" fill="#6B8F71" transform="rotate(-26 242 202)"/>
-    <circle cx="200" cy="312" r="26" fill="#EDE8DE" opacity="0.6"/>
-    <circle cx="200" cy="312" r="16" fill="#EDE8DE" opacity="0.42"/>
-  </svg>
-  <svg class="fl-br" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/>
-    <ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/>
-    <ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/>
-    <ellipse cx="158" cy="342" rx="36" ry="54" fill="#6B8F71" transform="rotate(-12 158 342)"/>
-    <path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <ellipse cx="242" cy="202" rx="20" ry="33" fill="#6B8F71" transform="rotate(-26 242 202)"/>
-    <circle cx="200" cy="312" r="28" fill="#EDE8DE" opacity="0.6"/>
-    <circle cx="200" cy="312" r="18" fill="#EDE8DE" opacity="0.42"/>
-  </svg>
+  <svg class="fl-tl" viewBox="0 0 400 400" fill="none"><ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/><ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/><ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/><circle cx="158" cy="58" r="46" fill="#6B8F71"/><circle cx="242" cy="184" r="36" fill="#6B8F71"/><path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="128" cy="242" rx="22" ry="37" fill="#6B8F71" transform="rotate(30 128 242)"/><circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/><circle cx="168" cy="62" r="20" fill="#EDE8DE" opacity="0.45"/></svg>
+  <svg class="fl-tr" viewBox="0 0 400 400" fill="none"><ellipse cx="180" cy="80" rx="62" ry="94" fill="#6B8F71" transform="rotate(-20 180 80)"/><ellipse cx="115" cy="145" rx="52" ry="78" fill="#6B8F71" transform="rotate(12 115 145)"/><ellipse cx="225" cy="165" rx="46" ry="72" fill="#6B8F71" transform="rotate(-38 225 165)"/><circle cx="158" cy="58" r="46" fill="#6B8F71"/><path d="M160 155 Q138 226 96 284" stroke="#3D5A42" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="168" cy="62" r="31" fill="#EDE8DE" opacity="0.7"/></svg>
+  <svg class="fl-bl" viewBox="0 0 400 400" fill="none"><ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/><ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/><ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/><path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="200" cy="312" r="26" fill="#EDE8DE" opacity="0.6"/></svg>
+  <svg class="fl-br" viewBox="0 0 400 400" fill="none"><ellipse cx="200" cy="300" rx="56" ry="82" fill="#6B8F71" transform="rotate(10 200 300)"/><ellipse cx="128" cy="262" rx="46" ry="70" fill="#6B8F71" transform="rotate(-22 128 262)"/><ellipse cx="272" cy="272" rx="42" ry="64" fill="#6B8F71" transform="rotate(32 272 272)"/><path d="M200 252 Q222 200 262 158" stroke="#3D5A42" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="200" cy="312" r="28" fill="#EDE8DE" opacity="0.6"/></svg>
 </div>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand" onclick="goPage('p-rsvp')">Beth &amp; Damian</span>
+    <div class="nav-links">
+      <button class="nav-btn active" id="nav-rsvp" onclick="goPage('p-rsvp')">RSVP</button>
+      <button class="nav-btn" id="nav-menu" onclick="goPage('p-menu')">Menu</button>
+      <button class="nav-btn" id="nav-schedule" onclick="goPage('p-schedule')">Schedule</button>
+      <button class="nav-btn" id="nav-accommodation" onclick="goPage('p-accommodation')">Stay</button>
+      <button class="nav-btn" id="nav-gallery" onclick="goPage('p-gallery')">Gallery</button>
+    </div>
+  </div>
+</nav>
 
 <div id="app">
 
-  <!-- ══════════════════════════════════════════
-       VIEW — RSVP
-  ══════════════════════════════════════════ -->
-  <div id="v-rsvp" class="view active">
+  <!-- RSVP PAGE -->
+  <div id="p-rsvp" class="page active">
     <div class="hero">
-      <p class="hero-eyebrow">You are warmly invited to celebrate</p>
+      <p class="eyebrow">You are warmly invited to celebrate</p>
       <h1 class="hero-names">Beth <span class="hero-amp">&amp;</span> Damian</h1>
-      <div class="ornament">
-        <div class="ornament-line"></div>
-        <span class="ornament-leaf">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg>
-        </span>
-        <div class="ornament-line r"></div>
-      </div>
-      <p class="hero-date">Kindly reply by the 1st of September</p>
+      <div class="ornament"><div class="orn-line"></div><span class="orn-leaf"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg></span><div class="orn-line r"></div></div>
+      <p class="hero-sub">Kindly reply by the 1st of September</p>
     </div>
-
-    <div class="col">
-
-      <!-- RSVP CARD -->
+    <div class="wrap">
       <div class="card">
-        <p class="card-eyebrow">RSVP</p>
-
+        <p class="card-label">RSVP</p>
         <div id="form-body">
-          <div class="field">
-            <label for="f-name">Your Full Name</label>
-            <input type="text" id="f-name" placeholder="First and last name" autocomplete="name"/>
-          </div>
-
-          <div class="field">
-            <label for="f-email">Email Address</label>
-            <input type="email" id="f-email" placeholder="your@email.com" autocomplete="email"/>
-          </div>
-
+          <div class="field"><label for="f-name">Your Full Name</label><input type="text" id="f-name" placeholder="First and last name" autocomplete="name"/></div>
+          <div class="field"><label for="f-email">Email Address</label><input type="email" id="f-email" placeholder="your@email.com" autocomplete="email"/></div>
           <div>
             <span class="att-legend">Will you be attending?</span>
             <div class="att-row">
-              <div class="att-opt">
-                <input type="radio" name="att" id="att-y" value="attending"/>
-                <label for="att-y"><span class="att-dot"></span>Accept with Pleasure</label>
-              </div>
-              <div class="att-opt">
-                <input type="radio" name="att" id="att-n" value="declined"/>
-                <label for="att-n"><span class="att-dot"></span>Decline with Regret</label>
-              </div>
+              <div class="att-opt"><input type="radio" name="att" id="att-y" value="attending"/><label for="att-y"><span class="att-dot"></span>Accept with Pleasure</label></div>
+              <div class="att-opt"><input type="radio" name="att" id="att-n" value="declined"/><label for="att-n"><span class="att-dot"></span>Decline with Regret</label></div>
             </div>
           </div>
-
           <div id="meal-wrap" style="display:none;">
-            <div class="meal-note">
-              <p>We would kindly ask guests to contribute half towards a three-course meal. The meal is not mandatory, but we would love for you to join us.</p>
-            </div>
-            <div class="field">
-              <label>Will you be joining for the meal?</label>
-              <select id="f-meal">
-                <option value="">Please select…</option>
-                <option value="yes">Yes, I would love to join</option>
-                <option value="no">No thank you</option>
-              </select>
-            </div>
+            <div class="note"><p>We kindly ask guests to contribute half towards a three-course meal. The meal is optional, but we would truly love for you to join us at the table.</p></div>
+            <div class="field"><label>Will you be joining for the meal?</label><select id="f-meal"><option value="">Please select…</option><option value="yes">Yes, I would love to join</option><option value="no">No thank you</option></select></div>
+            <div class="field"><label for="f-dietary">Any dietary requirements?</label><input type="text" id="f-dietary" placeholder="e.g. Vegetarian, gluten-free, nut allergy…"/></div>
           </div>
-
-          <div class="field">
-            <label for="f-msg">Message to Beth &amp; Damian <span style="opacity:.5;font-size:.85em;">(optional)</span></label>
-            <textarea id="f-msg" placeholder="Any well wishes or notes…"></textarea>
-          </div>
-
+          <div class="field"><label for="f-msg">A message to Beth &amp; Damian <span style="opacity:.45;font-size:.85em;">(optional)</span></label><textarea id="f-msg" placeholder="Any well wishes or notes…"></textarea></div>
           <button class="btn" id="submit-btn">SEND MY RSVP</button>
         </div>
-
         <div class="confirm" id="confirm-wrap" style="display:none;">
-          <div class="confirm-ring">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A9E82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
+          <div class="confirm-ring"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7A9E82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <h3>Thank you so much</h3>
           <p id="confirm-msg"></p>
         </div>
       </div>
 
-      <!-- WHO'S RESPONDED -->
-      <div class="guests-section">
-        <div class="card-eyebrow" style="margin-bottom:0;">
-          <div class="ornament" style="margin:0 auto 10px;"><div class="ornament-line"></div><span class="ornament-leaf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg></span><div class="ornament-line r"></div></div>
-        </div>
-        <div class="guests-header">
-          <h2>Who has responded</h2>
-          <p>Guests who have sent their RSVP</p>
-        </div>
-        <div class="card" style="padding: clamp(16px,5vw,28px) clamp(20px,6vw,36px);">
-          <ul class="guest-list" id="guest-list">
-            <li class="guests-empty" id="guest-empty">No responses yet — be the first!</li>
-          </ul>
-        </div>
+      <div class="ornament" style="margin-top:8px;"><div class="orn-line"></div><span class="orn-leaf"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 008 20C19 20 22 3 22 3c-1 2-8 2-13 5z"/></svg></span><div class="orn-line r"></div></div>
+      <div style="text-align:center;margin-bottom:clamp(14px,3.5vw,20px);">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:clamp(26px,6vw,34px);color:var(--forest);margin-bottom:5px;">Who has responded</h2>
+        <p style="font-family:'Cormorant SC',serif;font-size:10px;letter-spacing:.28em;color:var(--ink-light);">Guests who have sent their RSVP</p>
+      </div>
+      <div class="card" style="padding:clamp(14px,4vw,24px) clamp(18px,5vw,32px);">
+        <ul class="guest-list" id="guest-list"><li class="guests-empty" id="guest-empty">No responses yet — be the first!</li></ul>
+      </div>
+    </div>
+    <div class="footer-admin"><button class="admin-trigger" onclick="goPage('p-login')">Admin</button></div>
+  </div>
+
+  <!-- MENU PAGE -->
+  <div id="p-menu" class="page">
+    <div class="page-hero"><p class="eyebrow">The Celebration</p><h1 class="page-title">Menu &amp; Dining</h1><p class="page-sub">Three courses · Shared celebration</p></div>
+    <div class="wrap">
+      <p class="menu-intro">We are so excited to share a meal with you on our special day. We kindly ask guests to contribute half towards the cost of the three-course menu. No wedding gifts please — your presence is more than enough.</p>
+      <div class="note amber"><p>The meal is entirely optional, but we would truly love to have you at the table. If you have dietary requirements, please note them in your RSVP.</p></div>
+
+      <div class="card">
+        <p class="menu-section-title">STARTERS</p>
+        <h2 class="course-header">To Begin</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Roasted Tomato Soup</div><div class="menu-item-desc">Slow-roasted vine tomatoes, basil cream, toasted sourdough</div><div class="menu-tags"><span class="menu-tag vg">Vegan</span><span class="menu-tag gf">GF Option</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Smoked Salmon Blinis</div><div class="menu-item-desc">Scottish smoked salmon, crème fraîche, capers, dill</div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bruschetta al Pomodoro</div><div class="menu-item-desc">Heritage tomatoes, torn basil, aged balsamic, ciabatta</div><div class="menu-tags"><span class="menu-tag vg">Vegan</span></div></div><div class="menu-price">TBC</div></div>
       </div>
 
-    </div>
+      <div class="card">
+        <p class="menu-section-title">MAINS</p>
+        <h2 class="course-header">Main Course</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Roast Chicken Supreme</div><div class="menu-item-desc">Free-range chicken, dauphinoise potatoes, seasonal greens, red wine jus</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Pan-Seared Salmon</div><div class="menu-item-desc">Atlantic salmon, lemon butter, crushed new potatoes, tenderstem broccoli</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Wild Mushroom Risotto</div><div class="menu-item-desc">Arborio rice, mixed wild mushrooms, truffle oil, Parmesan crisp</div><div class="menu-tags"><span class="menu-tag v">Vegetarian</span><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+      </div>
 
-    <div class="footer-admin">
-      <button class="admin-trigger" onclick="showView('v-login')">Admin</button>
+      <div class="card">
+        <p class="menu-section-title">DESSERTS</p>
+        <h2 class="course-header">To Finish</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sticky Toffee Pudding</div><div class="menu-item-desc">Medjool date sponge, butterscotch sauce, clotted cream</div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lemon Panna Cotta</div><div class="menu-item-desc">Set cream, lemon curd, shortbread crumb, raspberry coulis</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chocolate Fondant</div><div class="menu-item-desc">Warm dark chocolate centre, vanilla bean ice cream</div><div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div></div><div class="menu-price">TBC</div></div>
+      </div>
+
+      <div class="card">
+        <p class="card-label">DIETARY KEY</p>
+        <div class="tag-key"><div class="tag-key-item"><span class="menu-tag vg">Vegan</span> Fully plant-based</div><div class="tag-key-item"><span class="menu-tag v">Vegetarian</span> No meat or fish</div><div class="tag-key-item"><span class="menu-tag gf">GF</span> Gluten free</div></div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3.5vw,16px);font-style:italic;color:var(--ink-light);line-height:1.7;">Please note any allergies or dietary requirements in your RSVP. We will do our very best to accommodate everyone.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">DRINKS</p>
+        <h2 class="course-header" style="margin-bottom:clamp(14px,3.5vw,20px);">Complimentary Drinks</h2>
+        <div class="note" style="margin-bottom:clamp(16px,4vw,22px);"><p>We are pleased to offer a selection of complimentary drinks throughout the evening. A full bar is available should you wish to order anything beyond what is listed.</p></div>
+        <div class="drinks-grid">
+          <div class="drink-card"><div class="drink-name">Prosecco</div><div class="drink-note">On arrival &amp; for the toast</div></div>
+          <div class="drink-card"><div class="drink-name">House Red &amp; White Wine</div><div class="drink-note">Served with the meal</div></div>
+          <div class="drink-card"><div class="drink-name">Soft Drinks</div><div class="drink-note">Throughout the day</div></div>
+          <div class="drink-card"><div class="drink-name">Tea &amp; Coffee</div><div class="drink-note">After the meal</div></div>
+        </div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3.5vw,16px);font-style:italic;color:var(--ink-light);line-height:1.7;margin-top:16px;">Spirits, cocktails, and additional drinks are available to purchase at the bar throughout the evening.</p>
+      </div>
+
+      <div class="note amber"><p>Prices for the three-course menu will be confirmed shortly. We ask guests to contribute half the cost per head. Full pricing will be updated here and shared in advance.</p></div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       VIEW — ADMIN LOGIN
-  ══════════════════════════════════════════ -->
-  <div id="v-login" class="view">
-    <div class="admin-login-col">
-      <button class="back" onclick="showView('v-rsvp')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Back
-      </button>
+  <!-- SCHEDULE PAGE -->
+  <div id="p-schedule" class="page">
+    <div class="page-hero"><p class="eyebrow">The Day</p><h1 class="page-title">Order of Events</h1><p class="page-sub">Full timings to follow</p></div>
+    <div class="wrap">
+      <div class="note" style="margin-bottom:clamp(20px,5vw,32px);"><p>We are finalising the timings for the day. The full schedule will be confirmed and updated here shortly — please check back closer to the date.</p></div>
       <div class="card">
-        <p class="card-eyebrow">ADMIN ACCESS</p>
-        <div class="field">
-          <label for="a-pass">Password</label>
-          <input type="password" id="a-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"/>
+        <p class="card-label">SCHEDULE OF THE DAY</p>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Guests Arrive</div><div class="tl-detail">Welcome drinks on arrival. A glass of Prosecco awaits you.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">The Ceremony</div><div class="tl-detail">We say our vows surrounded by the people we love most.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Drinks Reception</div><div class="tl-detail">Canapés, photographs, and time to celebrate together.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Wedding Breakfast</div><div class="tl-detail">Three courses, speeches, and a toast to the happy couple.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Evening Reception</div><div class="tl-detail">Dancing, music, and celebrations into the night.</div></div>
+          <div class="tl-item"><div class="tl-dot" style="background:var(--sage-light);"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Evening Closes</div><div class="tl-detail">A night to remember. Safe travels home.</div></div>
         </div>
+        <div class="tl-placeholder"><p>Exact timings to be confirmed — check back soon</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOMMODATION PAGE -->
+  <div id="p-accommodation" class="page">
+    <div class="page-hero"><p class="eyebrow">Your Stay</p><h1 class="page-title">Accommodation</h1><p class="page-sub">Options nearby · Details to follow</p></div>
+    <div class="wrap-wide">
+      <div class="note" style="max-width:680px;margin:0 auto clamp(20px,5vw,32px);"><p>We are gathering the best local accommodation options and will update this page shortly with full details and pricing. We recommend booking early to avoid disappointment.</p></div>
+      <div class="accom-grid">
+        <div class="accom-card"><div class="accom-type">ON-SITE</div><div class="accom-name">Venue Accommodation</div><div class="accom-detail">Limited rooms available at the venue itself for those who want to stay closest to the celebrations.</div><span class="accom-price">Pricing TBC</span></div>
+        <div class="accom-card"><div class="accom-type">NEARBY · EST. 5 MIN</div><div class="accom-name">Local Hotel</div><div class="accom-detail">A selection of hotels within a short drive of the venue. Full names and booking links to follow.</div><span class="accom-price">From TBC / night</span></div>
+        <div class="accom-card"><div class="accom-type">NEARBY · EST. 10 MIN</div><div class="accom-name">Bed &amp; Breakfast</div><div class="accom-detail">Charming local B&amp;Bs offering a warm, personal stay at a more affordable price point.</div><span class="accom-price">From TBC / night</span></div>
+        <div class="accom-card"><div class="accom-type">BUDGET OPTION</div><div class="accom-name">Budget Hotels</div><div class="accom-detail">For those looking for something more affordable, several well-known budget chains are available in the area.</div><span class="accom-price">From TBC / night</span></div>
+      </div>
+      <div class="accom-placeholder"><p>Full details, addresses &amp; booking links coming soon</p></div>
+      <div class="note amber" style="max-width:680px;margin:20px auto 0;"><p>If you need help finding somewhere to stay or have questions about transport on the day, please reach out to either Beth or Damian directly.</p></div>
+    </div>
+  </div>
+
+  <!-- GALLERY PAGE -->
+  <div id="p-gallery" class="page">
+    <div class="page-hero"><p class="eyebrow">Memories</p><h1 class="page-title">Photo Gallery</h1><p class="page-sub">Share your photos from our special day</p></div>
+    <div class="wrap-wide">
+      <p class="gallery-intro">We would love to see the day through your eyes. Once photo sharing is live, you will be able to upload directly from your phone or camera — every moment captured by the people who made the day.</p>
+      <div class="gallery-upload-zone">
+        <div class="upload-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="upload-title">Share your photos</div>
+        <div class="upload-sub">PNG and JPEG accepted &middot; From your phone or camera<br/>Upload functionality coming soon</div>
+        <div class="upload-chips">
+          <div class="upload-chip">UPLOAD FROM PHONE</div>
+          <div class="upload-chip">UPLOAD FROM COMPUTER</div>
+        </div>
+        <p class="gallery-coming">Photo sharing will be enabled closer to the wedding day</p>
+      </div>
+      <span class="gallery-section-label">GALLERY PREVIEW</span>
+      <div class="gallery-grid">
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="gallery-ph"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      </div>
+      <div class="note" style="margin-top:28px;"><p>After the wedding, photos can be shared directly with Beth and Damian. The gallery will be updated with highlights from the day for everyone to look back on.</p></div>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div id="p-login" class="page">
+    <div class="login-col">
+      <button class="back" onclick="goPage('p-rsvp')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back</button>
+      <div class="card">
+        <p class="card-label" style="text-align:center;">ADMIN ACCESS</p>
+        <div class="field"><label for="a-pass">Password</label><input type="password" id="a-pass" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()"/></div>
         <button class="btn" onclick="login()">ENTER</button>
         <p class="login-err" id="login-err">Incorrect password. Please try again.</p>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       VIEW — ADMIN PANEL
-  ══════════════════════════════════════════ -->
-  <div id="v-admin" class="view">
+  <!-- ADMIN PANEL -->
+  <div id="p-admin" class="page">
     <div class="admin-col">
-      <button class="back" onclick="showView('v-rsvp')" style="margin-bottom:6px;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to RSVP page
-      </button>
+      <button class="back" onclick="goPage('p-rsvp')" style="margin-bottom:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Back to site</button>
       <div class="admin-top">
-        <div>
-          <h1>Guest Responses</h1>
-          <p>Beth &amp; Damian's Wedding</p>
-        </div>
-        <button class="sign-out" onclick="showView('v-rsvp')">SIGN OUT</button>
+        <div><h1>Guest Responses</h1><p>Beth &amp; Damian's Wedding</p></div>
+        <button class="sign-out" onclick="goPage('p-rsvp')">SIGN OUT</button>
       </div>
-
       <div class="stats">
-        <div class="stat">
-          <div class="stat-num" id="s-total">0</div>
-          <div class="stat-label">Total</div>
-        </div>
-        <div class="stat s-att">
-          <div class="stat-num" id="s-att">0</div>
-          <div class="stat-label">Attending</div>
-        </div>
-        <div class="stat s-dec">
-          <div class="stat-num" id="s-dec">0</div>
-          <div class="stat-label">Declined</div>
-        </div>
+        <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Total</div></div>
+        <div class="stat s-att"><div class="stat-num" id="s-att">0</div><div class="stat-lbl">Attending</div></div>
+        <div class="stat s-dec"><div class="stat-num" id="s-dec">0</div><div class="stat-lbl">Declined</div></div>
       </div>
-
       <div class="tabs">
         <button class="tab on" onclick="setFilter('all',this)">All</button>
         <button class="tab" onclick="setFilter('attending',this)">Attending</button>
         <button class="tab" onclick="setFilter('declined',this)">Declined</button>
       </div>
-
       <div class="tbl-wrap">
         <table>
-          <thead>
-            <tr>
-              <th>Name &amp; Email</th>
-              <th>Status</th>
-              <th>Meal</th>
-              <th>Date</th>
-              <th></th>
-            </tr>
-          </thead>
+          <thead><tr><th>Name &amp; Email</th><th>Status</th><th>Meal</th><th>Dietary</th><th>Date</th><th></th></tr></thead>
           <tbody id="a-tbody"></tbody>
         </table>
         <div class="tbl-empty" id="tbl-empty" style="display:none;"><p>No responses yet.</p></div>
@@ -849,173 +458,95 @@
 
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-  /* ── CONFIG ───────────────────────────────── */
-  const PWD = 'BethDamian2025'; // ← Change this password before going live
-  const KEY = 'bd_rsvps';
-
-  /* ── STORAGE ──────────────────────────────── */
+  const PWD = 'BethDamian2025';
+  const KEY = 'bd_rsvps_v2';
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
   const save = d => localStorage.setItem(KEY, JSON.stringify(d));
 
-  /* ── VIEW ROUTER ──────────────────────────── */
-  let filter = 'all';
-  function showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const pages = ['p-rsvp','p-menu','p-schedule','p-accommodation','p-gallery','p-login','p-admin'];
+  const navMap = {'p-rsvp':'nav-rsvp','p-menu':'nav-menu','p-schedule':'nav-schedule','p-accommodation':'nav-accommodation','p-gallery':'nav-gallery'};
+
+  function goPage(id) {
+    pages.forEach(p => document.getElementById(p).classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (id === 'v-rsvp') renderGuestList();
-    if (id === 'v-admin') renderAdmin();
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    if (navMap[id]) document.getElementById(navMap[id]).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    if (id === 'p-rsvp') renderGuestList();
+    if (id === 'p-admin') renderAdmin();
   }
 
-  /* ── MEAL TOGGLE ──────────────────────────── */
   document.querySelectorAll('input[name="att"]').forEach(r => {
     r.addEventListener('change', () => {
       document.getElementById('meal-wrap').style.display = r.value === 'attending' ? 'block' : 'none';
     });
   });
 
-  /* ── SUBMIT RSVP ──────────────────────────── */
   document.getElementById('submit-btn').addEventListener('click', () => {
-    const name  = document.getElementById('f-name').value.trim();
-    const email = document.getElementById('f-email').value.trim();
-    const att   = document.querySelector('input[name="att"]:checked');
-    const meal  = document.getElementById('f-meal').value;
-    const msg   = document.getElementById('f-msg').value.trim();
-
-    if (!name)  { toast('Please enter your name'); return; }
-    if (!att)   { toast('Please choose your attendance'); return; }
-
-    const record = {
-      id:     Date.now().toString(),
-      name,
-      email,
-      status: att.value,
-      meal:   att.value === 'attending' ? meal : '',
-      msg,
-      date:   new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-    };
-
-    const all = load();
-    all.unshift(record);
-    save(all);
-
+    const name    = document.getElementById('f-name').value.trim();
+    const email   = document.getElementById('f-email').value.trim();
+    const att     = document.querySelector('input[name="att"]:checked');
+    const meal    = document.getElementById('f-meal').value;
+    const dietary = document.getElementById('f-dietary').value.trim();
+    const msg     = document.getElementById('f-msg').value.trim();
+    if (!name) { toast('Please enter your name'); return; }
+    if (!att)  { toast('Please choose your attendance'); return; }
+    const record = { id: Date.now().toString(), name, email, status: att.value, meal: att.value==='attending'?meal:'', dietary: att.value==='attending'?dietary:'', msg, date: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) };
+    const all = load(); all.unshift(record); save(all);
     document.getElementById('form-body').style.display = 'none';
-    const c = document.getElementById('confirm-wrap');
-    c.style.display = 'block';
+    document.getElementById('confirm-wrap').style.display = 'block';
     document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
       ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
       : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
-
     renderGuestList();
   });
 
-  /* ── PUBLIC GUEST LIST ────────────────────── */
   function renderGuestList() {
-    const all   = load();
-    const list  = document.getElementById('guest-list');
+    const all = load();
+    const list = document.getElementById('guest-list');
     const empty = document.getElementById('guest-empty');
-    if (all.length === 0) {
-      list.innerHTML = '';
-      list.appendChild(empty);
-      empty.style.display = 'block';
-      return;
-    }
+    if (all.length === 0) { list.innerHTML = ''; list.appendChild(empty); empty.style.display = 'block'; return; }
     empty.style.display = 'none';
-    list.innerHTML = all.map((r, i) => `
-      <li class="guest-item" style="animation-delay:${i * 0.04}s">
-        <span class="guest-name-cell">${esc(r.name)}</span>
-        <span class="badge ${r.status}">${r.status === 'attending' ? 'Attending' : 'Declined'}</span>
-      </li>
-    `).join('');
+    list.innerHTML = all.map((r,i) => `<li class="guest-item" style="animation-delay:${i*0.04}s"><span class="guest-name">${esc(r.name)}</span><span class="badge ${r.status}">${r.status==='attending'?'Attending':'Declined'}</span></li>`).join('');
   }
 
-  /* ── ADMIN LOGIN ──────────────────────────── */
   function login() {
     const v = document.getElementById('a-pass').value;
     const e = document.getElementById('login-err');
-    if (v === PWD) {
-      e.classList.remove('show');
-      document.getElementById('a-pass').value = '';
-      showView('v-admin');
-    } else {
-      e.classList.add('show');
-    }
+    if (v === PWD) { e.classList.remove('show'); document.getElementById('a-pass').value=''; goPage('p-admin'); }
+    else { e.classList.add('show'); }
   }
 
-  /* ── FILTER ───────────────────────────────── */
-  function setFilter(f, btn) {
-    filter = f;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-    btn.classList.add('on');
-    renderAdmin();
-  }
+  let filter = 'all';
+  function setFilter(f,btn) { filter=f; document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); btn.classList.add('on'); renderAdmin(); }
 
-  /* ── ADMIN RENDER ─────────────────────────── */
   function renderAdmin() {
     const all = load();
-    const att = all.filter(r => r.status === 'attending');
-    const dec = all.filter(r => r.status === 'declined');
+    const att = all.filter(r=>r.status==='attending');
+    const dec = all.filter(r=>r.status==='declined');
     document.getElementById('s-total').textContent = all.length;
     document.getElementById('s-att').textContent   = att.length;
     document.getElementById('s-dec').textContent   = dec.length;
-
-    const rows = filter === 'all' ? all : filter === 'attending' ? att : dec;
+    const rows = filter==='all'?all:filter==='attending'?att:dec;
     const tbody = document.getElementById('a-tbody');
     const empty = document.getElementById('tbl-empty');
-
-    if (rows.length === 0) {
-      tbody.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
+    if (rows.length === 0) { tbody.innerHTML=''; empty.style.display='block'; return; }
     empty.style.display = 'none';
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>
-          <div>${esc(r.name)}</div>
-          ${r.email ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
-          ${r.msg   ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
-        </td>
-        <td><span class="badge ${r.status}">${r.status === 'attending' ? 'Attending' : 'Declined'}</span></td>
-        <td style="font-size:clamp(13px,3.5vw,15px);">
-          ${r.meal === 'yes' ? 'Joining meal' : r.meal === 'no' ? 'Not joining' : '—'}
-        </td>
-        <td style="font-size:clamp(12px,3vw,14px);color:var(--ink-light);font-family:'Jost',sans-serif;font-weight:300;white-space:nowrap;">${r.date}</td>
-        <td>
-          <button class="del-btn" onclick="delRSVP('${r.id}')" title="Remove guest">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = rows.map(r=>`<tr><td><div>${esc(r.name)}</div>${r.email?`<div class="td-meta">${esc(r.email)}</div>`:''} ${r.msg?`<div class="td-msg">"${esc(r.msg)}"</div>`:''}</td><td><span class="badge ${r.status}">${r.status==='attending'?'Attending':'Declined'}</span></td><td style="font-size:clamp(13px,3.5vw,15px);">${r.meal==='yes'?'Joining':r.meal==='no'?'Not joining':'—'}</td><td style="font-size:clamp(13px,3.5vw,15px);font-style:italic;color:var(--ink-light);">${r.dietary||'—'}</td><td style="font-size:clamp(11px,3vw,13px);color:var(--ink-light);font-family:'Jost',sans-serif;font-weight:300;white-space:nowrap;">${r.date}</td><td><button class="del-btn" onclick="delRSVP('${r.id}')" title="Remove"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button></td></tr>`).join('');
   }
 
-  /* ── DELETE ───────────────────────────────── */
   function delRSVP(id) {
     if (!confirm('Remove this guest response?')) return;
-    save(load().filter(r => r.id !== id));
-    renderAdmin();
-    toast('Response removed');
+    save(load().filter(r=>r.id!==id)); renderAdmin(); toast('Response removed');
   }
 
-  /* ── UTILS ────────────────────────────────── */
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  let toastTimer;
-  function toast(msg) {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.classList.add('up');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('up'), 3000);
-  }
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  let tt;
+  function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('up'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('up'),3000); }
 
-  /* ── INIT ─────────────────────────────────── */
   renderGuestList();
 </script>
 </body>
