@@ -221,6 +221,37 @@
       .accom-grid { grid-template-columns: 1fr 1fr; }
       .gallery-grid { grid-template-columns: repeat(4,1fr); }
     }
+
+    /* COOKIE BANNER */
+    .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999; background: var(--forest); border-top: 1px solid var(--sage-dark); padding: clamp(14px,3vw,20px) clamp(16px,4vw,32px); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; transform: translateY(100%); transition: transform 0.4s ease; }
+    .cookie-banner.show { transform: translateY(0); }
+    .cookie-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(13px,3vw,15px); color: var(--parchment); line-height: 1.6; flex: 1; min-width: 200px; }
+    .cookie-text a { color: var(--sage-light); text-decoration: underline; cursor: pointer; }
+    .cookie-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .cookie-btn { font-family: 'Cormorant SC', serif; font-size: 10px; letter-spacing: 0.2em; padding: 10px 20px; border-radius: 1px; cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap; }
+    .cookie-accept { background: var(--sage); color: var(--parchment); }
+    .cookie-accept:hover { background: var(--sage-dark); }
+    .cookie-decline { background: transparent; color: var(--sage-light); border: 1px solid var(--sage-dark) !important; }
+    .cookie-decline:hover { color: var(--parchment); }
+
+    /* PRIVACY PAGE */
+    .privacy-wrap { max-width: 680px; margin: 0 auto; padding: clamp(32px,7vw,64px) clamp(16px,5vw,28px) 80px; }
+    .privacy-wrap h1 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(32px,7vw,50px); color: var(--forest); margin-bottom: 6px; }
+    .privacy-wrap .privacy-date { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; color: var(--ink-light); margin-bottom: clamp(28px,5vw,44px); }
+    .privacy-wrap h2 { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(18px,4vw,24px); color: var(--forest); margin: clamp(24px,5vw,36px) 0 10px; }
+    .privacy-wrap p, .privacy-wrap li { font-family: 'Cormorant Garamond', serif; font-size: clamp(14px,3.5vw,16px); color: var(--ink-light); line-height: 1.85; margin-bottom: 12px; }
+    .privacy-wrap ul { padding-left: 20px; margin-bottom: 12px; }
+    .privacy-wrap li { margin-bottom: 6px; }
+    .privacy-wrap a { color: var(--sage-dark); text-decoration: underline; }
+    .privacy-wrap strong { color: var(--ink); font-weight: 400; }
+    .privacy-back { display: inline-flex; align-items: center; gap: 6px; font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 300; letter-spacing: 0.1em; color: var(--sage); background: none; border: none; cursor: pointer; margin-bottom: 28px; padding: 0; }
+    .privacy-back:hover { color: var(--forest); }
+
+    /* FOOTER PRIVACY LINK */
+    .footer-privacy { text-align: center; padding: 0 0 20px; }
+    .footer-privacy-link { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 300; letter-spacing: 0.12em; color: var(--ink-light); background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 4px 8px; }
+    .footer-privacy-link:hover { color: var(--sage); }
+    .footer-privacy-sep { color: var(--border); font-size: 10px; }
   </style>
 </head>
 <body>
@@ -297,187 +328,91 @@
 
   <!-- MENU PAGE -->
   <div id="p-menu" class="page">
-    <div class="page-hero"><p class="eyebrow">The Celebration</p><h1 class="page-title">Menu &amp; Dining</h1><p class="page-sub">A meal shared with the people we love most</p></div>
+    <div class="page-hero"><p class="eyebrow">The Celebration</p><h1 class="page-title">Menu &amp; Dining</h1><p class="page-sub">Three courses · Shared celebration</p></div>
     <div class="wrap">
-      <p class="menu-intro">We are so excited to share a meal with you on our special day. No wedding gifts please — your presence is more than enough.</p>
+      <p class="menu-intro">We are so excited to share a meal with you on our special day. We kindly ask guests to contribute half towards the cost of the three-course menu. No wedding gifts please — your presence is more than enough.</p>
+      <div class="note amber"><p>The meal is entirely optional, but we would truly love to have you at the table. If you have dietary requirements, please note them in your RSVP.</p></div>
 
-      <!-- ADULT MENU -->
-      <div class="card" style="margin-bottom:clamp(16px,4vw,24px);">
-        <p class="card-label">ADULT MENU</p>
-
-        <p class="menu-section-title">STARTER</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Tomato &amp; Basil Soup</div>
-            <div class="menu-item-desc">Served with bread rolls, salted butter, tea and coffee</div>
-            <div class="menu-tags"><span class="menu-tag vg">Vegan</span></div>
-          </div>
-          <div class="menu-price">Included</div>
-        </div>
-
-        <p class="menu-section-title" style="margin-top:clamp(18px,4vw,26px);">MAIN</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Cottage Pie</div>
-            <div class="menu-item-desc">Served with garlic and herb roast potatoes in skins, seasonal vegetables and jugs of gravy</div>
-          </div>
-          <div class="menu-price">£48.75 pp</div>
-        </div>
-
-        <p class="menu-section-title" style="margin-top:clamp(18px,4vw,26px);">DESSERT</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Warm Chocolate Chip Cookie</div>
-            <div class="menu-item-desc">Served with vanilla ice cream</div>
-            <div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div>
-          </div>
-          <div class="menu-price">Included</div>
-        </div>
+      <div class="card">
+        <p class="menu-section-title">STARTERS</p>
+        <h2 class="course-header">To Begin</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Roasted Tomato Soup</div><div class="menu-item-desc">Slow-roasted vine tomatoes, basil cream, toasted sourdough</div><div class="menu-tags"><span class="menu-tag vg">Vegan</span><span class="menu-tag gf">GF Option</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Smoked Salmon Blinis</div><div class="menu-item-desc">Scottish smoked salmon, crème fraîche, capers, dill</div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Bruschetta al Pomodoro</div><div class="menu-item-desc">Heritage tomatoes, torn basil, aged balsamic, ciabatta</div><div class="menu-tags"><span class="menu-tag vg">Vegan</span></div></div><div class="menu-price">TBC</div></div>
       </div>
 
-      <!-- VEGETARIAN OPTION -->
-      <div class="card" style="margin-bottom:clamp(16px,4vw,24px);">
-        <p class="card-label">VEGETARIAN OPTION</p>
-        <p class="menu-section-title">MAIN</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Truffle Gnocchi</div>
-            <div class="menu-item-desc">Served with mushroom cream, wilted red and green kale, and pine nuts</div>
-            <div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div>
-          </div>
-          <div class="menu-price">£57.00 pp</div>
-        </div>
+      <div class="card">
+        <p class="menu-section-title">MAINS</p>
+        <h2 class="course-header">Main Course</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Roast Chicken Supreme</div><div class="menu-item-desc">Free-range chicken, dauphinoise potatoes, seasonal greens, red wine jus</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Pan-Seared Salmon</div><div class="menu-item-desc">Atlantic salmon, lemon butter, crushed new potatoes, tenderstem broccoli</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Wild Mushroom Risotto</div><div class="menu-item-desc">Arborio rice, mixed wild mushrooms, truffle oil, Parmesan crisp</div><div class="menu-tags"><span class="menu-tag v">Vegetarian</span><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
       </div>
 
-      <!-- CHILDREN'S MENU -->
-      <div class="card" style="margin-bottom:clamp(16px,4vw,24px);">
-        <p class="card-label">CHILDREN'S MENU — £27.50 (all 3 courses)</p>
-
-        <p class="menu-section-title">STARTER</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Cheesy Garlic Dough Balls</div>
-            <div class="menu-item-desc">Served with parsley dip</div>
-            <div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div>
-          </div>
-        </div>
-
-        <p class="menu-section-title" style="margin-top:clamp(18px,4vw,26px);">MAIN</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Chicken Burger</div>
-            <div class="menu-item-desc">Served with savoury potato wedges and beans</div>
-          </div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Bean Burger</div>
-            <div class="menu-item-desc">Served with savoury potato wedges and beans</div>
-            <div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div>
-          </div>
-        </div>
-
-        <p class="menu-section-title" style="margin-top:clamp(18px,4vw,26px);">DESSERT</p>
-        <div class="menu-item">
-          <div class="menu-item-left">
-            <div class="menu-item-name">Ice Cream Surprise</div>
-            <div class="menu-item-desc">Served with sauces</div>
-            <div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div>
-          </div>
-        </div>
-
-        <div class="tag-key" style="margin-top:clamp(16px,4vw,24px);">
-          <div class="tag-key-item"><span class="menu-tag vg">Vegan</span> Fully plant-based</div>
-          <div class="tag-key-item"><span class="menu-tag v">Vegetarian</span> No meat or fish</div>
-          <div class="tag-key-item"><span class="menu-tag gf">GF</span> Gluten free</div>
-        </div>
+      <div class="card">
+        <p class="menu-section-title">DESSERTS</p>
+        <h2 class="course-header">To Finish</h2>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Sticky Toffee Pudding</div><div class="menu-item-desc">Medjool date sponge, butterscotch sauce, clotted cream</div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Lemon Panna Cotta</div><div class="menu-item-desc">Set cream, lemon curd, shortbread crumb, raspberry coulis</div><div class="menu-tags"><span class="menu-tag gf">GF</span></div></div><div class="menu-price">TBC</div></div>
+        <div class="menu-item"><div class="menu-item-left"><div class="menu-item-name">Chocolate Fondant</div><div class="menu-item-desc">Warm dark chocolate centre, vanilla bean ice cream</div><div class="menu-tags"><span class="menu-tag v">Vegetarian</span></div></div><div class="menu-price">TBC</div></div>
       </div>
 
-      <div class="note amber"><p>Please let us know of any dietary requirements or allergies when you RSVP so we can make sure everything is perfect for you on the day.</p></div>
+      <div class="card">
+        <p class="card-label">DIETARY KEY</p>
+        <div class="tag-key"><div class="tag-key-item"><span class="menu-tag vg">Vegan</span> Fully plant-based</div><div class="tag-key-item"><span class="menu-tag v">Vegetarian</span> No meat or fish</div><div class="tag-key-item"><span class="menu-tag gf">GF</span> Gluten free</div></div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3.5vw,16px);font-style:italic;color:var(--ink-light);line-height:1.7;">Please note any allergies or dietary requirements in your RSVP. We will do our very best to accommodate everyone.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-label">DRINKS</p>
+        <h2 class="course-header" style="margin-bottom:clamp(14px,3.5vw,20px);">Complimentary Drinks</h2>
+        <div class="note" style="margin-bottom:clamp(16px,4vw,22px);"><p>We are pleased to offer a selection of complimentary drinks throughout the evening. A full bar is available should you wish to order anything beyond what is listed.</p></div>
+        <div class="drinks-grid">
+          <div class="drink-card"><div class="drink-name">Prosecco</div><div class="drink-note">On arrival &amp; for the toast</div></div>
+          <div class="drink-card"><div class="drink-name">House Red &amp; White Wine</div><div class="drink-note">Served with the meal</div></div>
+          <div class="drink-card"><div class="drink-name">Soft Drinks</div><div class="drink-note">Throughout the day</div></div>
+          <div class="drink-card"><div class="drink-name">Tea &amp; Coffee</div><div class="drink-note">After the meal</div></div>
+        </div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3.5vw,16px);font-style:italic;color:var(--ink-light);line-height:1.7;margin-top:16px;">Spirits, cocktails, and additional drinks are available to purchase at the bar throughout the evening.</p>
+      </div>
+
+      <div class="note amber"><p>Prices for the three-course menu will be confirmed shortly. We ask guests to contribute half the cost per head. Full pricing will be updated here and shared in advance.</p></div>
     </div>
   </div>
 
   <!-- SCHEDULE PAGE -->
   <div id="p-schedule" class="page">
-    <div class="page-hero"><p class="eyebrow">The Day</p><h1 class="page-title">Order of Events</h1><p class="page-sub">Saturday · Pendrell Hall</p></div>
+    <div class="page-hero"><p class="eyebrow">The Day</p><h1 class="page-title">Order of Events</h1><p class="page-sub">Full timings to follow</p></div>
     <div class="wrap">
+      <div class="note" style="margin-bottom:clamp(20px,5vw,32px);"><p>We are finalising the timings for the day. The full schedule will be confirmed and updated here shortly — please check back closer to the date.</p></div>
       <div class="card">
         <p class="card-label">SCHEDULE OF THE DAY</p>
         <div class="timeline">
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">12:30</div><div class="tl-event">Guests Arrive</div><div class="tl-detail">Please sign the guest book on your way in. Feel free to get a drink and chat while you wait.</div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">13:30</div><div class="tl-event">The Ceremony</div><div class="tl-detail">We say our vows surrounded by the people we love most.</div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">14:45</div><div class="tl-event">Drinks Reception</div><div class="tl-detail">Relax after the ceremony, chat, drink, and explore the beautiful grounds of Pendrell Hall.</div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">16:00</div><div class="tl-event">Wedding Breakfast</div><div class="tl-detail">Three courses, speeches, and a toast to the happy couple.</div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">18:00</div><div class="tl-event">Second Drinks Reception</div><div class="tl-detail">A chance to relax and mingle before the evening celebrations begin.</div></div>
-          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">18:30</div><div class="tl-event">Evening Reception</div><div class="tl-detail">Dancing, music, and celebrations into the night.</div></div>
-          <div class="tl-item"><div class="tl-dot" style="background:var(--sage-light);"></div><div class="tl-time">00:00</div><div class="tl-event">Evening Closes</div><div class="tl-detail">A night to remember. Safe travels home.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Guests Arrive</div><div class="tl-detail">Welcome drinks on arrival. A glass of Prosecco awaits you.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">The Ceremony</div><div class="tl-detail">We say our vows surrounded by the people we love most.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Drinks Reception</div><div class="tl-detail">Canapés, photographs, and time to celebrate together.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Wedding Breakfast</div><div class="tl-detail">Three courses, speeches, and a toast to the happy couple.</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Evening Reception</div><div class="tl-detail">Dancing, music, and celebrations into the night.</div></div>
+          <div class="tl-item"><div class="tl-dot" style="background:var(--sage-light);"></div><div class="tl-time">TIME TBC</div><div class="tl-event">Evening Closes</div><div class="tl-detail">A night to remember. Safe travels home.</div></div>
         </div>
+        <div class="tl-placeholder"><p>Exact timings to be confirmed — check back soon</p></div>
       </div>
     </div>
   </div>
 
   <!-- ACCOMMODATION PAGE -->
   <div id="p-accommodation" class="page">
-    <div class="page-hero"><p class="eyebrow">Your Stay</p><h1 class="page-title">Accommodation</h1><p class="page-sub">Pendrell Hall · Onsite &amp; Nearby</p></div>
+    <div class="page-hero"><p class="eyebrow">Your Stay</p><h1 class="page-title">Accommodation</h1><p class="page-sub">Options nearby · Details to follow</p></div>
     <div class="wrap-wide">
-      <div class="note" style="max-width:680px;margin:0 auto clamp(20px,5vw,32px);"><p>There are a number of accommodation options available at Pendrell Hall. We recommend booking early to avoid disappointment. For full terms and conditions or to book, visit <strong>bestdayever-venues.co.uk</strong></p></div>
-
+      <div class="note" style="max-width:680px;margin:0 auto clamp(20px,5vw,32px);"><p>We are gathering the best local accommodation options and will update this page shortly with full details and pricing. We recommend booking early to avoid disappointment.</p></div>
       <div class="accom-grid">
-
-        <div class="accom-card">
-          <div class="accom-type">INCLUDED · 12 NOON CHECK-IN</div>
-          <div class="accom-name">Luxury Wedding Night Suite</div>
-          <div class="accom-detail">Choose from one of three magnificent Hall Suites for the wedding night. Included within the venue hire price.</div>
-          <span class="accom-price">Included</span>
-        </div>
-
-        <div class="accom-card">
-          <div class="accom-type">ON-SITE · 12 NOON CHECK-IN</div>
-          <div class="accom-name">The Hall Suites</div>
-          <div class="accom-detail">Two incredibly spacious luxury suites located within Pendrell Hall itself, featuring stunning original period features, a super king-size bed and magnificent views. Perfect for parents or close family.</div>
-          <span class="accom-price">£250 per suite*</span>
-        </div>
-
-        <div class="accom-card">
-          <div class="accom-type">ON-SITE · 1PM CHECK-IN</div>
-          <div class="accom-name">The Shepherds Hut</div>
-          <div class="accom-detail">Fancy something a bit different? A quirky, cute and super cosy Shepherds Hut sleeping two guests.</div>
-          <span class="accom-price">£130 (Sleeps 2)*</span>
-        </div>
-
-        <div class="accom-card">
-          <div class="accom-type">ON-SITE · CHECK-IN VARIES</div>
-          <div class="accom-name">Orchard Stables Guest Rooms</div>
-          <div class="accom-detail">20 beautiful en-suite bedrooms located just opposite the wedding venue. Check-in times vary per room — some 12 noon, some 1pm, some 2pm.</div>
-          <span class="accom-price">From £125 per room*</span>
-        </div>
-
-        <div class="accom-card">
-          <div class="accom-type">ON-SITE · FAMILY ROOMS</div>
-          <div class="accom-name">Orchard Stables Double Plus Rooms</div>
-          <div class="accom-detail">Perfect for guests bringing children. En-suite rooms featuring a double bed, one single bed and a cot. Located right next to the venue in the Orchard Stables.</div>
-          <span class="accom-price">From £135 per room*</span>
-        </div>
-
-        <div class="accom-card">
-          <div class="accom-type">ON-SITE · SELF-CATERING</div>
-          <div class="accom-name">The Lodge &amp; The Cottage</div>
-          <div class="accom-detail">Luxury self-catering accommodation. Both three-bedroom properties sleep six people each and can be booked for the night before the wedding, subject to availability.</div>
-          <span class="accom-price">From £450 per property*</span>
-        </div>
-
+        <div class="accom-card"><div class="accom-type">ON-SITE</div><div class="accom-name">Venue Accommodation</div><div class="accom-detail">Limited rooms available at the venue itself for those who want to stay closest to the celebrations.</div><span class="accom-price">Pricing TBC</span></div>
+        <div class="accom-card"><div class="accom-type">NEARBY · EST. 5 MIN</div><div class="accom-name">Local Hotel</div><div class="accom-detail">A selection of hotels within a short drive of the venue. Full names and booking links to follow.</div><span class="accom-price">From TBC / night</span></div>
+        <div class="accom-card"><div class="accom-type">NEARBY · EST. 10 MIN</div><div class="accom-name">Bed &amp; Breakfast</div><div class="accom-detail">Charming local B&amp;Bs offering a warm, personal stay at a more affordable price point.</div><span class="accom-price">From TBC / night</span></div>
+        <div class="accom-card"><div class="accom-type">BUDGET OPTION</div><div class="accom-name">Budget Hotels</div><div class="accom-detail">For those looking for something more affordable, several well-known budget chains are available in the area.</div><span class="accom-price">From TBC / night</span></div>
       </div>
-
-      <div class="card" style="max-width:680px;margin:clamp(20px,5vw,32px) auto 0;">
-        <p class="card-label">BREAKFAST TOGETHER</p>
-        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(15px,3.5vw,17px);color:var(--ink);line-height:1.75;">Join overnight guests for breakfast the morning after the wedding in The Orchard Stables Breakfast Room. Choose from a delicious cooked breakfast, Danish pastries, toast and cereal, served with tea or coffee.</p>
-      </div>
-
-      <div class="note" style="max-width:680px;margin:clamp(16px,4vw,24px) auto 0;">
-        <p>* Room rates are correct at time of printing and are subject to change. We encourage guests to book early to secure their rate. Full accommodation terms and conditions are available upon request and are issued with a room booking. An additional £50 per room is charged for New Year's Eve.</p>
-      </div>
-
-      <div class="note amber" style="max-width:680px;margin:clamp(12px,3vw,16px) auto 0;"><p>To book or for more information, visit <strong>bestdayever-venues.co.uk</strong> or reach out to Beth or Damian directly.</p></div>
+      <div class="accom-placeholder"><p>Full details, addresses &amp; booking links coming soon</p></div>
+      <div class="note amber" style="max-width:680px;margin:20px auto 0;"><p>If you need help finding somewhere to stay or have questions about transport on the day, please reach out to either Beth or Damian directly.</p></div>
     </div>
   </div>
 
@@ -562,12 +497,13 @@
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
   const save = d => localStorage.setItem(KEY, JSON.stringify(d));
 
-  const pages = ['p-rsvp','p-menu','p-schedule','p-accommodation','p-gallery','p-login','p-admin'];
+  const pages = ['p-rsvp','p-menu','p-schedule','p-accommodation','p-gallery','p-login','p-admin','p-privacy'];
   const navMap = {'p-rsvp':'nav-rsvp','p-menu':'nav-menu','p-schedule':'nav-schedule','p-accommodation':'nav-accommodation','p-gallery':'nav-gallery'};
 
   function goPage(id) {
-    pages.forEach(p => document.getElementById(p).classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    pages.forEach(p => { const el = document.getElementById(p); if(el) el.classList.remove('active'); });
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     if (navMap[id]) document.getElementById(navMap[id]).classList.add('active');
     window.scrollTo({top:0,behavior:'smooth'});
@@ -644,6 +580,85 @@
   function toast(msg) { const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('up'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('up'),3000); }
 
   renderGuestList();
+</script>
+
+<!-- PRIVACY PAGE -->
+<div id="p-privacy" class="page">
+  <div class="privacy-wrap">
+    <button class="privacy-back" onclick="goPage('p-rsvp')">← Back</button>
+    <h1>Privacy Policy</h1>
+    <p class="privacy-date">Last updated: July 2026</p>
+
+    <h2>Who we are</h2>
+    <p>This website is operated by <strong>Aidan Wheaton</strong> trading as <strong>Dunvale Studio</strong>, a web design studio based in Staffordshire, England. You can contact us at <a href="mailto:aidan@dunvalestudio.co.uk">aidan@dunvalestudio.co.uk</a>.</p>
+
+    <h2>What data we collect</h2>
+    <p>When you fill in the RSVP form on this website, we collect:</p>
+    <ul>
+      <li>Your name</li>
+      <li>Your email address (if provided)</li>
+      <li>Your attendance status</li>
+      <li>Your meal preference and dietary requirements</li>
+      <li>Any message you choose to include</li>
+    </ul>
+    <p>We do not collect any payment information. We do not use advertising cookies or tracking pixels of any kind.</p>
+
+    <h2>Why we collect it</h2>
+    <p>The information collected through the RSVP form is used solely to plan the wedding — specifically to manage guest attendance numbers, meal requirements, and dietary needs. It is not used for any other purpose and will not be shared with any third party beyond the couple and their immediate wedding planning.</p>
+
+    <h2>How your data is stored</h2>
+    <p>RSVP responses are stored locally in your browser's localStorage on the device used to access the admin section of this website. No data is sent to an external server or database through this website.</p>
+
+    <h2>How long we keep your data</h2>
+    <p>RSVP data is held until after the wedding has taken place, after which it will be cleared. If you would like your response removed before then, please contact us at <a href="mailto:aidan@dunvalestudio.co.uk">aidan@dunvalestudio.co.uk</a>.</p>
+
+    <h2>Cookies</h2>
+    <p>This website does not use tracking cookies, advertising cookies, or analytics of any kind.</p>
+    <p>The website is served through <strong>Cloudflare</strong> and hosted on <strong>Vercel</strong>, both of which may set strictly necessary functional cookies to ensure security and performance. These cannot be disabled as they are required for the website to function correctly.</p>
+    <p>You can manage or delete cookies through your browser settings at any time.</p>
+
+    <h2>Your rights under UK GDPR</h2>
+    <p>You have the right to access, correct, or request deletion of any personal data we hold about you. To exercise any of these rights, please email <a href="mailto:aidan@dunvalestudio.co.uk">aidan@dunvalestudio.co.uk</a> and we will respond within 30 days.</p>
+    <p>If you believe your data has not been handled correctly you have the right to lodge a complaint with the Information Commissioner's Office at <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>.</p>
+
+    <h2>Contact</h2>
+    <p>For any privacy questions: <a href="mailto:aidan@dunvalestudio.co.uk">aidan@dunvalestudio.co.uk</a></p>
+  </div>
+</div>
+
+<!-- FOOTER PRIVACY LINK -->
+<div class="footer-privacy">
+  <button class="footer-privacy-link" onclick="goPage('p-privacy')">Privacy Policy</button>
+  <span class="footer-privacy-sep">·</span>
+  <button class="footer-privacy-link" onclick="goPage('p-privacy')">Cookie Policy</button>
+  <span class="footer-privacy-sep">·</span>
+  <span class="footer-privacy-link" style="cursor:default;">Website by <a href="https://dunvalestudio.co.uk" target="_blank" rel="noopener" style="color:var(--sage);text-decoration:none;">Dunvale Studio</a></span>
+</div>
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookie-banner">
+  <p class="cookie-text">We use strictly necessary cookies to keep this website secure and running. No tracking, no advertising. <a onclick="goPage('p-privacy')">Learn more</a></p>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-decline" onclick="cookieChoice(false)">Decline optional</button>
+    <button class="cookie-btn cookie-accept" onclick="cookieChoice(true)">Accept</button>
+  </div>
+</div>
+
+<script>
+  // Cookie banner
+  (function() {
+    const choice = localStorage.getItem('ds_cookie_choice');
+    if (!choice) {
+      setTimeout(function() {
+        document.getElementById('cookie-banner').classList.add('show');
+      }, 800);
+    }
+  })();
+
+  function cookieChoice(accepted) {
+    localStorage.setItem('ds_cookie_choice', accepted ? 'accepted' : 'declined');
+    document.getElementById('cookie-banner').classList.remove('show');
+  }
 </script>
 </body>
 </html>
