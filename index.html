@@ -615,7 +615,7 @@
         document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
           ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
           : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
-        addToPublicList(name, att.value);
+        addToPublicList(name, att.value, email, mealText, dietary, msg);
         // Scroll to guest list so they see their name appear
         setTimeout(() => {
           const guestList = document.getElementById('guest-list');
@@ -639,9 +639,20 @@
   const loadPublic  = () => { try { return JSON.parse(localStorage.getItem(GUEST_KEY)) || []; } catch { return []; } };
   const savePublic  = d  => localStorage.setItem(GUEST_KEY, JSON.stringify(d));
 
-  function addToPublicList(name, status) {
+  function addToPublicList(name, status, email, meal, dietary, msg) {
     const all = loadPublic();
-    all.unshift({ name, status, isNew: true, id: Date.now().toString(), source: 'public' });
+    all.unshift({
+      id:      Date.now().toString(),
+      source:  'public',
+      name,
+      status,
+      email:   email   || 'Not provided',
+      meal:    meal    || 'Not selected',
+      dietary: dietary || 'None',
+      msg:     msg     || 'None',
+      date:    new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}),
+      isNew:   true
+    });
     savePublic(all);
     renderGuestList();
     setTimeout(() => {
