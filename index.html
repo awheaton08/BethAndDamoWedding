@@ -609,7 +609,7 @@
     })
     .then(res => res.json())
     .then(data => {
-      if (data.success) {
+      if (data && (data.success === true || data.success === 'true')) {
         document.getElementById('form-body').style.display = 'none';
         document.getElementById('confirm-wrap').style.display = 'block';
         document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
@@ -736,11 +736,11 @@
         <td>
           <div style="font-weight:400;">${esc(r.name)}</div>
           ${r.email && r.email !== 'Not provided' ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
-          ${r.meal  ? `<div class="td-meta">Meal: ${esc(r.meal)}</div>` : ''}
-          ${r.dietary && r.dietary !== 'None' ? `<div class="td-meta">Dietary: ${esc(r.dietary)}</div>` : ''}
           ${r.msg && r.msg !== 'None' ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
         </td>
         <td><span class="badge ${r.status}">${r.status==='attending'?'✓ Attending':'✗ Declined'}</span></td>
+        <td style="font-size:clamp(12px,3vw,14px);color:var(--ink);">${r.meal && r.meal !== 'Not selected' ? esc(r.meal) : '—'}</td>
+        <td style="font-size:clamp(12px,3vw,14px);font-style:italic;color:var(--ink-light);">${r.dietary && r.dietary !== 'None' ? esc(r.dietary) : '—'}</td>
         <td style="font-size:clamp(11px,3vw,13px);color:var(--ink-light);white-space:nowrap;">${r.date||'—'}</td>
         <td>
           <button class="del-btn" onclick="delGuest('${r.id}','${r.source||'admin'}')" title="Remove">
