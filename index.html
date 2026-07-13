@@ -94,6 +94,7 @@
     .guest-item { display: flex; align-items: center; justify-content: space-between; padding: clamp(11px,3vw,14px) 0; border-bottom: 1px solid #F0EBE2; animation: fadeUp 0.3s ease both; }
     .guest-item:last-child { border-bottom: none; }
     .guest-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(17px,4vw,20px); }
+    .guest-new { background: linear-gradient(90deg, rgba(106,143,113,0.12), transparent); border-radius: 2px; transition: background 1.2s ease; }
     .badge { font-family: 'Cormorant SC', serif; font-size: clamp(7.5px,2vw,9px); letter-spacing: 0.2em; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
     .badge.attending { background: #DFF0E0; color: var(--sage-dark); }
     .badge.declined { background: #F5E8E3; color: #8B5E52; }
@@ -615,6 +616,11 @@
           ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
           : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
         addToPublicList(name, att.value);
+        // Scroll to guest list so they see their name appear
+        setTimeout(() => {
+          const guestList = document.getElementById('guest-list');
+          if (guestList) guestList.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 600);
       } else {
         toast('Something went wrong. Please try again or contact Beth & Damian directly.');
         btn.textContent = 'SEND MY RSVP';
@@ -628,19 +634,29 @@
     });
   });
 
-  // ── PUBLIC GUEST LIST — stores only first name + attending/declined, session only ──
-  // This clears on page refresh — no personal data persists
-  let sessionGuests = [];
+  // ── GUEST LIST — persists in localStorage (name + status only, no personal data) ──
+  const GUEST_KEY = 'bd_public_guests_v1';
+  const loadPublic  = () => { try { return JSON.parse(localStorage.getItem(GUEST_KEY)) || []; } catch { return []; } };
+  const savePublic  = d  => localStorage.setItem(GUEST_KEY, JSON.stringify(d));
 
   function addToPublicList(name, status) {
-    sessionGuests.unshift({ name, status });
+    const all = loadPublic();
+    all.unshift({ name, status, isNew: true, id: Date.now().toString(), source: 'public' });
+    savePublic(all);
     renderGuestList();
+    setTimeout(() => {
+      const all2 = loadPublic();
+      if (all2[0]) { all2[0].isNew = false; savePublic(all2); }
+    }, 1500);
   }
 
   function renderGuestList() {
-    // Show admin-managed list + any session submissions
+    const publicGuests = loadPublic();
     const adminGuests  = loadGuests();
-    const combined     = [...sessionGuests, ...adminGuests];
+    // Merge — avoid duplicates between public and admin lists
+    const adminNames   = adminGuests.map(r => r.name.toLowerCase());
+    const filtered     = publicGuests.filter(r => !adminNames.includes(r.name.toLowerCase()));
+    const combined     = [...filtered, ...adminGuests];
     const list         = document.getElementById('guest-list');
     const empty        = document.getElementById('guest-empty');
     if (combined.length === 0) {
@@ -651,7 +667,7 @@
     }
     empty.style.display = 'none';
     list.innerHTML = combined.map((r,i) =>
-      `<li class="guest-item" style="animation-delay:${i*0.04}s">
+      `<li class="guest-item${r.isNew ? ' guest-new' : ''}" style="animation-delay:${i*0.04}s">
         <span class="guest-name">${esc(r.name)}</span>
         <span class="badge ${r.status}">${r.status==='attending'?'✓ Attending':'✗ Declined'}</span>
       </li>`
@@ -683,7 +699,13 @@
 
   // ── RENDER ADMIN ──
   function renderAdmin() {
-    const all = loadGuests();
+    const adminGuests  = loadGuests();
+    const publicGuests = loadPublic();
+    // Merge all — public submissions + manually added
+    const adminNames   = adminGuests.map(r => r.name.toLowerCase());
+    const publicOnly   = publicGuests.filter(r => !adminNames.includes(r.name.toLowerCase()));
+    const all          = [...adminGuests, ...publicOnly];
+
     const att = all.filter(r => r.status === 'attending');
     const dec = all.filter(r => r.status === 'declined');
 
@@ -702,15 +724,15 @@
       `<tr>
         <td>
           <div style="font-weight:400;">${esc(r.name)}</div>
-          ${r.email ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
+          ${r.email && r.email !== 'Not provided' ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
           ${r.meal  ? `<div class="td-meta">Meal: ${esc(r.meal)}</div>` : ''}
-          ${r.dietary ? `<div class="td-meta">Dietary: ${esc(r.dietary)}</div>` : ''}
-          ${r.msg   ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
+          ${r.dietary && r.dietary !== 'None' ? `<div class="td-meta">Dietary: ${esc(r.dietary)}</div>` : ''}
+          ${r.msg && r.msg !== 'None' ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
         </td>
         <td><span class="badge ${r.status}">${r.status==='attending'?'✓ Attending':'✗ Declined'}</span></td>
         <td style="font-size:clamp(11px,3vw,13px);color:var(--ink-light);white-space:nowrap;">${r.date||'—'}</td>
         <td>
-          <button class="del-btn" onclick="delGuest('${r.id}')" title="Remove">
+          <button class="del-btn" onclick="delGuest('${r.id}','${r.source||'admin'}')" title="Remove">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </td>
@@ -749,18 +771,24 @@
   }
 
   // ── DELETE GUEST (admin panel) ──
-  function delGuest(id) {
+  function delGuest(id, source) {
     if (!confirm('Remove this guest?')) return;
-    saveGuests(loadGuests().filter(r => r.id !== id));
+    if (source === 'public') {
+      savePublic(loadPublic().filter(r => r.id !== id));
+    } else {
+      saveGuests(loadGuests().filter(r => r.id !== id));
+    }
     renderAdmin();
+    renderGuestList();
     toast('Guest removed');
   }
 
-  // ── CLEAR ALL (admin panel) ──
   function clearAll() {
     if (!confirm('Remove ALL guests from the list? This cannot be undone.')) return;
     saveGuests([]);
+    savePublic([]);
     renderAdmin();
+    renderGuestList();
     toast('All guests cleared');
   }
 
