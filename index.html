@@ -539,18 +539,51 @@
 
 <script>
   const PWD = 'BethDamian2025';
-  // ── CONSTANTS ──
-  // RSVP form posts to Formspree — Beth & Damian get an email for every submission
-  const FORMSPREE = 'https://api.web3forms.com/submit';
+  // ── SUPABASE CONFIG ──
+  const SB_URL = 'https://qlysrgxwzqmhzoqhdpjo.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFseXNyZ3h3enFtaHpvcWhkcGpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NzQxNjIsImV4cCI6MjA5OTU1MDE2Mn0.plL2qVIpQ_oULxxxYSyhgHLPZllb96W04-auTKHlKio';
 
-  // Admin guest list stored in localStorage on Beth & Damian's device only
-  // Guests never write to this — only the admin panel does
-  // No personal RSVP data is stored from guest submissions
-  const ADMIN_KEY = 'bd_admin_guests_v1';
-  const PWD_KEY   = 'bd_admin_session';
+  // Web3Forms for email notifications to Beth & Damian
+  const W3F_KEY = '6971aa78-ca01-4d63-8df8-ad5277e769f4';
 
-  const loadGuests  = () => { try { return JSON.parse(localStorage.getItem(ADMIN_KEY)) || []; } catch { return []; } };
-  const saveGuests  = d  => localStorage.setItem(ADMIN_KEY, JSON.stringify(d));
+  const PWD_KEY = 'bd_admin_session';
+
+  // ── SUPABASE HELPERS ──
+  async function sbInsert(data) {
+    const res = await fetch(`${SB_URL}/rest/v1/rsvps`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  }
+
+  async function sbSelect() {
+    const res = await fetch(`${SB_URL}/rest/v1/rsvps?select=*&order=created_at.desc`, {
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`
+      }
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  async function sbDelete(id) {
+    const res = await fetch(`${SB_URL}/rest/v1/rsvps?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`
+      }
+    });
+    return res.ok;
+  }
 
   const pages = ['p-rsvp','p-menu','p-schedule','p-accommodation','p-gallery','p-login','p-admin','p-privacy'];
   const navMap = {'p-rsvp':'nav-rsvp','p-menu':'nav-menu','p-schedule':'nav-schedule','p-accommodation':'nav-accommodation','p-gallery':'nav-gallery'};
@@ -568,8 +601,8 @@
 
   // Meal is always visible — no toggle needed
 
-  // ── RSVP SUBMIT — sends to Formspree, no personal data stored locally ──
-  document.getElementById('submit-btn').addEventListener('click', () => {
+  // ── RSVP SUBMIT — saves to Supabase + sends email via Web3Forms ──
+  document.getElementById('submit-btn').addEventListener('click', async () => {
     const name    = document.getElementById('f-name').value.trim();
     const email   = document.getElementById('f-email').value.trim();
     const att     = document.querySelector('input[name="att"]:checked');
@@ -584,101 +617,76 @@
     btn.textContent = 'Sending...';
     btn.disabled = true;
 
-    // Build a clear email for Beth & Damian
-    const status = att.value === 'attending' ? '✅ ATTENDING' : '❌ DECLINED';
-    const mealText = att.value === 'attending'
-      ? (meal || 'Not selected')
-      : 'N/A';
+    const status   = att.value === 'attending' ? '✅ ATTENDING' : '❌ DECLINED';
+    const mealText = att.value === 'attending' ? (meal || 'Not selected') : 'N/A';
 
-    fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        access_key: '6971aa78-ca01-4d63-8df8-ad5277e769f4',
-        subject: `Wedding RSVP from ${name} — ${status}`,
-        from_name: 'Beth & Damian Wedding',
-        botcheck: '',
-        Name: name,
-        Email: email || 'Not provided',
-        Attendance: status,
-        Meal: mealText,
-        'Dietary Requirements': dietary || 'None',
-        Message: msg || 'None',
-        Source: 'Beth & Damian Wedding RSVP'
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data && (data.success === true || data.success === 'true')) {
-        document.getElementById('form-body').style.display = 'none';
-        document.getElementById('confirm-wrap').style.display = 'block';
-        document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
-          ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
-          : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
-        addToPublicList(name, att.value, email, mealText, dietary, msg);
-        // Scroll to guest list so they see their name appear
-        setTimeout(() => {
-          const guestList = document.getElementById('guest-list');
-          if (guestList) guestList.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 600);
-      } else {
-        toast('Something went wrong. Please try again or contact Beth & Damian directly.');
-        btn.textContent = 'SEND MY RSVP';
-        btn.disabled = false;
-      }
-    })
-    .catch(() => {
+    try {
+      // 1. Save to Supabase
+      const saved = await sbInsert({
+        name,
+        email:   email   || null,
+        status:  att.value,
+        meal:    mealText,
+        dietary: dietary || null,
+        msg:     msg     || null
+      });
+
+      if (!saved) throw new Error('Supabase insert failed');
+
+      // 2. Send email notification via Web3Forms (best effort — do not block on failure)
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: W3F_KEY,
+          subject: `Wedding RSVP from ${name} — ${status}`,
+          from_name: 'Beth & Damian Wedding',
+          botcheck: '',
+          Name: name,
+          Email: email || 'Not provided',
+          Attendance: status,
+          Meal: mealText,
+          'Dietary Requirements': dietary || 'None',
+          Message: msg || 'None'
+        })
+      }).catch(() => {}); // silently ignore email errors
+
+      // 3. Show confirmation
+      document.getElementById('form-body').style.display = 'none';
+      document.getElementById('confirm-wrap').style.display = 'block';
+      document.getElementById('confirm-msg').innerHTML = att.value === 'attending'
+        ? 'Your RSVP has been received.<br/>Beth and Damian cannot wait to celebrate with you.'
+        : 'Your response has been noted.<br/>Thank you for letting Beth and Damian know.';
+
+      // 4. Refresh guest list from Supabase
+      await renderGuestList();
+      setTimeout(() => {
+        const guestList = document.getElementById('guest-list');
+        if (guestList) guestList.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 600);
+
+    } catch(e) {
       toast('Something went wrong. Please try again or contact Beth & Damian directly.');
       btn.textContent = 'SEND MY RSVP';
       btn.disabled = false;
-    });
+    }
   });
 
-  // ── GUEST LIST — persists in localStorage (name + status only, no personal data) ──
-  const GUEST_KEY = 'bd_public_guests_v1';
-  const loadPublic  = () => { try { return JSON.parse(localStorage.getItem(GUEST_KEY)) || []; } catch { return []; } };
-  const savePublic  = d  => localStorage.setItem(GUEST_KEY, JSON.stringify(d));
+  // Guest list and admin now powered by Supabase — no localStorage needed
 
-  function addToPublicList(name, status, email, meal, dietary, msg) {
-    const all = loadPublic();
-    all.unshift({
-      id:      Date.now().toString(),
-      source:  'public',
-      name,
-      status,
-      email:   email   || 'Not provided',
-      meal:    meal    || 'Not selected',
-      dietary: dietary || 'None',
-      msg:     msg     || 'None',
-      date:    new Date().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}),
-      isNew:   true
-    });
-    savePublic(all);
-    renderGuestList();
-    setTimeout(() => {
-      const all2 = loadPublic();
-      if (all2[0]) { all2[0].isNew = false; savePublic(all2); }
-    }, 1500);
-  }
-
-  function renderGuestList() {
-    const publicGuests = loadPublic();
-    const adminGuests  = loadGuests();
-    // Merge — avoid duplicates between public and admin lists
-    const adminNames   = adminGuests.map(r => r.name.toLowerCase());
-    const filtered     = publicGuests.filter(r => !adminNames.includes(r.name.toLowerCase()));
-    const combined     = [...filtered, ...adminGuests];
-    const list         = document.getElementById('guest-list');
-    const empty        = document.getElementById('guest-empty');
-    if (combined.length === 0) {
+  async function renderGuestList() {
+    const list  = document.getElementById('guest-list');
+    const empty = document.getElementById('guest-empty');
+    const all   = await sbSelect();
+    if (all.length === 0) {
       list.innerHTML = '';
       list.appendChild(empty);
       empty.style.display = 'block';
       return;
     }
     empty.style.display = 'none';
-    list.innerHTML = combined.map((r,i) =>
-      `<li class="guest-item${r.isNew ? ' guest-new' : ''}" style="animation-delay:${i*0.04}s">
+    list.innerHTML = all.map((r,i) =>
+      `<li class="guest-item" style="animation-delay:${i*0.04}s">
         <span class="guest-name">${esc(r.name)}</span>
         <span class="badge ${r.status}">${r.status==='attending'?'✓ Attending':'✗ Declined'}</span>
       </li>`
@@ -709,14 +717,8 @@
   }
 
   // ── RENDER ADMIN ──
-  function renderAdmin() {
-    const adminGuests  = loadGuests();
-    const publicGuests = loadPublic();
-    // Merge all — public submissions + manually added
-    const adminNames   = adminGuests.map(r => r.name.toLowerCase());
-    const publicOnly   = publicGuests.filter(r => !adminNames.includes(r.name.toLowerCase()));
-    const all          = [...adminGuests, ...publicOnly];
-
+  async function renderAdmin() {
+    const all = await sbSelect();
     const att = all.filter(r => r.status === 'attending');
     const dec = all.filter(r => r.status === 'declined');
 
@@ -731,28 +733,29 @@
     if (rows.length === 0) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
     empty.style.display = 'none';
 
-    tbody.innerHTML = rows.map(r =>
-      `<tr>
+    tbody.innerHTML = rows.map(r => {
+      const date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      return `<tr>
         <td>
           <div style="font-weight:400;">${esc(r.name)}</div>
-          ${r.email && r.email !== 'Not provided' ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
-          ${r.msg && r.msg !== 'None' ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
+          ${r.email ? `<div class="td-meta">${esc(r.email)}</div>` : ''}
+          ${r.msg ? `<div class="td-msg">"${esc(r.msg)}"</div>` : ''}
         </td>
         <td><span class="badge ${r.status}">${r.status==='attending'?'✓ Attending':'✗ Declined'}</span></td>
-        <td style="font-size:clamp(12px,3vw,14px);color:var(--ink);">${r.meal && r.meal !== 'Not selected' ? esc(r.meal) : '—'}</td>
-        <td style="font-size:clamp(12px,3vw,14px);font-style:italic;color:var(--ink-light);">${r.dietary && r.dietary !== 'None' ? esc(r.dietary) : '—'}</td>
-        <td style="font-size:clamp(11px,3vw,13px);color:var(--ink-light);white-space:nowrap;">${r.date||'—'}</td>
+        <td style="font-size:clamp(12px,3vw,14px);color:var(--ink);">${r.meal && r.meal !== 'Not selected' && r.meal !== 'N/A' ? esc(r.meal) : '—'}</td>
+        <td style="font-size:clamp(12px,3vw,14px);font-style:italic;color:var(--ink-light);">${r.dietary ? esc(r.dietary) : '—'}</td>
+        <td style="font-size:clamp(11px,3vw,13px);color:var(--ink-light);white-space:nowrap;">${date}</td>
         <td>
-          <button class="del-btn" onclick="delGuest('${r.id}','${r.source||'admin'}')" title="Remove">
+          <button class="del-btn" onclick="delGuest('${r.id}')" title="Remove">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </td>
-      </tr>`
-    ).join('');
+      </tr>`;
+    }).join('');
   }
 
   // ── ADD GUEST (admin panel) ──
-  function adminAddGuest() {
+  async function adminAddGuest() {
     const nameEl   = document.getElementById('admin-add-name');
     const statusEl = document.getElementById('admin-add-status');
     const emailEl  = document.getElementById('admin-add-email');
@@ -760,46 +763,46 @@
     const dietEl   = document.getElementById('admin-add-diet');
     const name     = nameEl.value.trim();
     if (!name) { toast('Please enter a name'); return; }
-    const record = {
-      id:      Date.now().toString(),
+    const saved = await sbInsert({
       name,
-      email:   emailEl.value.trim(),
+      email:   emailEl.value.trim() || null,
       status:  statusEl.value,
-      meal:    mealEl.value.trim(),
-      dietary: dietEl.value.trim(),
-      msg:     '',
-      date:    new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})
-    };
-    const all = loadGuests();
-    all.unshift(record);
-    saveGuests(all);
-    nameEl.value = '';
-    emailEl.value = '';
-    mealEl.value = '';
-    dietEl.value = '';
-    renderAdmin();
-    toast('Guest added ✓');
+      meal:    mealEl.value || null,
+      dietary: dietEl.value.trim() || null,
+      msg:     null
+    });
+    if (saved) {
+      nameEl.value = '';
+      emailEl.value = '';
+      mealEl.value = '';
+      dietEl.value = '';
+      await renderAdmin();
+      await renderGuestList();
+      toast('Guest added ✓');
+    } else {
+      toast('Something went wrong. Please try again.');
+    }
   }
 
   // ── DELETE GUEST (admin panel) ──
-  function delGuest(id, source) {
+  async function delGuest(id) {
     if (!confirm('Remove this guest?')) return;
-    if (source === 'public') {
-      savePublic(loadPublic().filter(r => r.id !== id));
+    const ok = await sbDelete(id);
+    if (ok) {
+      await renderAdmin();
+      await renderGuestList();
+      toast('Guest removed');
     } else {
-      saveGuests(loadGuests().filter(r => r.id !== id));
+      toast('Something went wrong. Please try again.');
     }
-    renderAdmin();
-    renderGuestList();
-    toast('Guest removed');
   }
 
-  function clearAll() {
-    if (!confirm('Remove ALL guests from the list? This cannot be undone.')) return;
-    saveGuests([]);
-    savePublic([]);
-    renderAdmin();
-    renderGuestList();
+  async function clearAll() {
+    if (!confirm('Remove ALL guests? This cannot be undone.')) return;
+    const all = await sbSelect();
+    await Promise.all(all.map(r => sbDelete(r.id)));
+    await renderAdmin();
+    await renderGuestList();
     toast('All guests cleared');
   }
 
